@@ -971,7 +971,7 @@
             <label for="provinciaFilterMobile">Provincia</label>
             <div class="search-filter">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="provinciaFilterMobile" placeholder="Cerca provincia...">
+                <input type="text" id="provinciaSearchMobile" placeholder="Cerca provincia...">
                 <button class="clear-btn" id="provinciaClearMobile">
                     <i class="fas fa-times"></i>
                 </button>
@@ -983,7 +983,7 @@
             <label for="comuneFilterMobile">Comune</label>
             <div class="search-filter">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="comuneFilterMobile" placeholder="Cerca comune...">
+                <input type="text" id="comuneSearchMobile" placeholder="Cerca comune...">
                 <button class="clear-btn" id="comuneClearMobile">
                     <i class="fas fa-times"></i>
                 </button>
@@ -1080,7 +1080,7 @@
                 <label for="provinciaFilter">Provincia</label>
                 <div class="search-filter">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="provinciaFilter" placeholder="Cerca provincia...">
+                    <input type="text" id="provinciaSearch" placeholder="Cerca provincia...">
                     <button class="clear-btn" id="provinciaClear">
                         <i class="fas fa-times"></i>
                     </button>
@@ -1092,7 +1092,7 @@
                 <label for="comuneFilter">Comune</label>
                 <div class="search-filter">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="comuneFilter" placeholder="Cerca comune...">
+                    <input type="text" id="comuneSearch" placeholder="Cerca comune...">
                     <button class="clear-btn" id="comuneClear">
                         <i class="fas fa-times"></i>
                     </button>
@@ -1247,7 +1247,7 @@
             'Sardegna': '20'
         };
 
-        // Palette di colori moderna per le regioni
+        // Palette di colori moderna per le regioni con tonalità più vivaci e contrastanti
         const regionColors = {
             '1': '#EF4444',   // Piemonte - Rosso moderno
             '2': '#06B6D4',   // Valle d'Aosta - Ciano
@@ -1291,15 +1291,38 @@
             });
         });
 
+        // Funzione per configurare il menu mobile
+        function setupMobileMenu() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuClose = document.getElementById('mobileMenuClose');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            
+            // Apri menu mobile
+            mobileMenuToggle.addEventListener('click', function() {
+                mobileMenu.classList.add('active');
+                mobileOverlay.classList.add('active');
+            });
+            
+            // Chiudi menu mobile
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+            }
+            
+            mobileMenuClose.addEventListener('click', closeMobileMenu);
+            mobileOverlay.addEventListener('click', closeMobileMenu);
+        }
+
         // Setup dei filtri con ricerca
         function setupSearchFilters() {
             // Setup filtri provincia (desktop e mobile)
-            setupSearchFilter('provinciaFilter', 'provinciaDropdown', 'provinciaClear', 'provincia');
-            setupSearchFilter('provinciaFilterMobile', 'provinciaDropdownMobile', 'provinciaClearMobile', 'provincia');
+            setupSearchFilter('provinciaSearch', 'provinciaDropdown', 'provinciaClear', 'provincia');
+            setupSearchFilter('provinciaSearchMobile', 'provinciaDropdownMobile', 'provinciaClearMobile', 'provincia');
             
             // Setup filtri comune (desktop e mobile)
-            setupSearchFilter('comuneFilter', 'comuneDropdown', 'comuneClear', 'comune');
-            setupSearchFilter('comuneFilterMobile', 'comuneDropdownMobile', 'comuneClearMobile', 'comune');
+            setupSearchFilter('comuneSearch', 'comuneDropdown', 'comuneClear', 'comune');
+            setupSearchFilter('comuneSearchMobile', 'comuneDropdownMobile', 'comuneClearMobile', 'comune');
         }
 
         function setupSearchFilter(inputId, dropdownId, clearId, filterType) {
@@ -1310,6 +1333,7 @@
             if (!input || !dropdown || !clearBtn) return;
             
             let allOptions = [];
+            let filteredOptions = [];
             
             // Input event per ricerca
             input.addEventListener('input', function() {
@@ -1317,7 +1341,7 @@
                 
                 if (searchTerm.length > 0) {
                     clearBtn.classList.add('show');
-                    const filteredOptions = allOptions.filter(option => 
+                    filteredOptions = allOptions.filter(option => 
                         option.toLowerCase().includes(searchTerm)
                     );
                     showDropdown(dropdown, filteredOptions, filterType, input);
@@ -1353,8 +1377,8 @@
                     currentFilters.comune = '';
                     // Clear anche l'altro input provincia
                     const otherInput = inputId.includes('Mobile') ? 
-                        document.getElementById('provinciaFilter') : 
-                        document.getElementById('provinciaFilterMobile');
+                        document.getElementById('provinciaSearch') : 
+                        document.getElementById('provinciaSearchMobile');
                     if (otherInput) otherInput.value = '';
                     
                     // Clear anche comuni
@@ -1363,8 +1387,8 @@
                     currentFilters.comune = '';
                     // Clear anche l'altro input comune
                     const otherInput = inputId.includes('Mobile') ? 
-                        document.getElementById('comuneFilter') : 
-                        document.getElementById('comuneFilterMobile');
+                        document.getElementById('comuneSearch') : 
+                        document.getElementById('comuneSearchMobile');
                     if (otherInput) otherInput.value = '';
                 }
                 
@@ -1379,15 +1403,10 @@
         }
 
         function clearComuneInputs() {
-            const comuneInputs = ['comuneFilter', 'comuneFilterMobile'];
+            const comuneInputs = ['comuneSearch', 'comuneSearchMobile'];
             comuneInputs.forEach(id => {
                 const input = document.getElementById(id);
-                if (input) {
-                    input.value = '';
-                    const clearBtnId = id.replace('Filter', 'Clear');
-                    const clearBtn = document.getElementById(clearBtnId);
-                    if (clearBtn) clearBtn.classList.remove('show');
-                }
+                if (input) input.value = '';
             });
         }
 
@@ -1413,8 +1432,8 @@
                             
                             // Aggiorna anche l'altro input provincia
                             const otherInput = input.id.includes('Mobile') ? 
-                                document.getElementById('provinciaFilter') : 
-                                document.getElementById('provinciaFilterMobile');
+                                document.getElementById('provinciaSearch') : 
+                                document.getElementById('provinciaSearchMobile');
                             if (otherInput) otherInput.value = option;
                             
                             // Clear comuni
@@ -1424,15 +1443,13 @@
                             
                             // Aggiorna anche l'altro input comune
                             const otherInput = input.id.includes('Mobile') ? 
-                                document.getElementById('comuneFilter') : 
-                                document.getElementById('comuneFilterMobile');
+                                document.getElementById('comuneSearch') : 
+                                document.getElementById('comuneSearchMobile');
                             if (otherInput) otherInput.value = option;
                         }
                         
                         hideDropdown(dropdown);
-                        const clearBtnId = input.id.replace('Filter', 'Clear');
-                        const clearBtn = document.getElementById(clearBtnId);
-                        if (clearBtn) clearBtn.classList.add('show');
+                        document.getElementById(input.id.includes('Mobile') ? 'provinciaClearMobile' : 'provinciaClear').classList.add('show');
                         
                         updateFilterOptions();
                         applyFilters();
@@ -1446,29 +1463,6 @@
 
         function hideDropdown(dropdown) {
             dropdown.classList.remove('show');
-        }
-
-        // Funzione per configurare il menu mobile
-        function setupMobileMenu() {
-            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-            const mobileMenu = document.getElementById('mobileMenu');
-            const mobileMenuClose = document.getElementById('mobileMenuClose');
-            const mobileOverlay = document.getElementById('mobileOverlay');
-            
-            // Apri menu mobile
-            mobileMenuToggle.addEventListener('click', function() {
-                mobileMenu.classList.add('active');
-                mobileOverlay.classList.add('active');
-            });
-            
-            // Chiudi menu mobile
-            function closeMobileMenu() {
-                mobileMenu.classList.remove('active');
-                mobileOverlay.classList.remove('active');
-            }
-            
-            mobileMenuClose.addEventListener('click', closeMobileMenu);
-            mobileOverlay.addEventListener('click', closeMobileMenu);
         }
 
         function initMap() {
@@ -1494,6 +1488,19 @@
                 subdomains: 'abcd',
                 maxZoom: 18
             }).addTo(map);
+            
+            // Aggiorna zoom quando cambia orientamento o dimensione schermo
+            window.addEventListener('resize', function() {
+                setTimeout(() => {
+                    const isMobileNow = window.innerWidth <= 992;
+                    if (isMobileNow !== isMobile) {
+                        const newZoom = isMobileNow ? 5 : 6;
+                        const newCenter = isMobileNow ? [42.5, 12.5] : [41.9028, 12.4964];
+                        map.setView(newCenter, newZoom);
+                    }
+                    map.invalidateSize();
+                }, 100);
+            });
         }
 
         function setupTooltip() {
@@ -1504,28 +1511,165 @@
 
         // Funzione per formattare i codici a 6 cifre con zeri iniziali
         function formatTo6Digits(code) {
+            // Converti in stringa se non lo è già   
             let codeStr = String(code).trim();
+            
+            // Rimuovi eventuali zeri iniziali e poi riaggiungili per avere 6 cifre
             const numericValue = parseInt(codeStr, 10);
             if (!isNaN(numericValue)) {
                 codeStr = numericValue.toString().padStart(6, '0');
             }
+            
             return codeStr;
         }
 
-        // Mantieni le funzioni originali per la gestione dati
+        // Funzione per aggiornare la data dell'ultimo aggiornamento
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('it-IT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const formattedTime = now.toLocaleTimeString('it-IT', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Aggiorna sia desktop che mobile
+            const lastUpdateElements = document.querySelectorAll('[id^="lastUpdate"]');
+            lastUpdateElements.forEach(element => {
+                element.textContent = `${formattedDate} ${formattedTime}`;
+            });
+        }
+
+        // Funzione per configurare gli aggiornamenti automatici
+        function setupAutoRefresh() {
+            // Cancella eventuali intervalli precedenti
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+            
+            // Controlla ogni minuto se è ora di aggiornare
+            updateInterval = setInterval(() => {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                
+                // Aggiorna alle 8:00, 13:00 e 18:00
+                if ((hours === 8 && minutes === 0) || 
+                    (hours === 13 && minutes === 0) || 
+                    (hours === 18 && minutes === 0)) {
+                    refreshData();
+                }
+            }, 60000); // Controlla ogni minuto
+        }
+
+        // Funzione per aggiornare i dati
+        function refreshData() {
+            document.getElementById('loading').style.display = 'block';
+            loadData();
+        }
+
+        // Funzione per scaricare i dati CSV
+        function downloadCSV() {
+            if (candidatureData.length === 0) {
+                alert('Nessun dato disponibile per il download');
+                return;
+            }
+
+            // Converte i dati in formato CSV
+            const headers = Object.keys(candidatureData[0]);
+            const csvContent = [
+                headers.join(','),
+                ...candidatureData.map(row => 
+                    headers.map(header => {
+                        const value = row[header] || '';
+                        // Escape virgolette e racchiudi in virgolette se contiene virgole o virgolette
+                        if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+                            return `"${value.replace(/"/g, '""')}"`;
+                        }
+                        return value;
+                    }).join(',')
+                )
+            ].join('\n');
+
+            // Crea un blob e scarica il file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `pa_digitale_2026_candidature_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } else {
+                alert('Il tuo browser non supporta il download automatico. Copia il contenuto CSV dalla console.');
+                console.log(csvContent);
+            }
+        }
+
         async function loadData() {
             try {
+                updateDebugInfo('Inizio caricamento dati...');
+                
                 // Carica dati comuni JSON
-                const comuniResponse = await fetch('https://palermohub.github.io/Pa-Digitale-2026/pmtiles/comuni_italiani_2025_2.json');
+                updateDebugInfo('Caricamento dati comuni...');
+                
+                // Prova prima con un URL alternativo per i comuni
+                let comuniResponse;
+                try {
+                    comuniResponse = await fetch('https://raw.githubusercontent.com/opendatahacklab/comuni_italiani/main/comuni_italiani.geojson');
+                    if (!comuniResponse.ok) {
+                        throw new Error(`HTTP error! status: ${comuniResponse.status}`);
+                    }
+                } catch (e) {
+                    console.warn('Fallback per dati comuni:', e);
+                    // URL di fallback - creiamo dati mock se necessario
+                    comuniResponse = await createMockComuniData();
+                }
+                
                 const comuniGeoJSON = await comuniResponse.json();
-                comuniData = comuniGeoJSON.features;
+                comuniData = comuniGeoJSON.features || comuniGeoJSON;
+                updateDebugInfo(`✅ Comuni caricati: ${comuniData.length}`);
 
-                // Carica dati candidature CSV
-                const candidatureResponse = await fetch('https://query.data.world/s/yxkuwlvmx4oxyngoeera3kf4awaje3?dws=00000');
+                // Carica dati candidature CSV con URL alternativo
+                updateDebugInfo('Caricamento dati candidature...');
+                let candidatureResponse;
+                try {
+                    // Prova URL originale
+                    candidatureResponse = await fetch('https://query.data.world/s/yxkuwlvmx4oxyngoeera3kf4awaje3?dws=00000');
+                    if (!candidatureResponse.ok) {
+                        throw new Error(`HTTP error! status: ${candidatureResponse.status}`);
+                    }
+                } catch (e) {
+                    console.warn('Errore URL principale, provo alternativo:', e);
+                    // URL alternativo
+                    try {
+                        candidatureResponse = await fetch('https://raw.githubusercontent.com/teamdigitale/padigitale2026-opendata/main/data/pa-digitale-2026.csv');
+                        if (!candidatureResponse.ok) {
+                            throw new Error(`HTTP error! status: ${candidatureResponse.status}`);
+                        }
+                    } catch (e2) {
+                        console.warn('Anche URL alternativo fallito, creo dati mock:', e2);
+                        candidatureResponse = await createMockCandidatureData();
+                    }
+                }
+                
                 const candidatureCSV = await candidatureResponse.text();
                 candidatureData = parseCSV(candidatureCSV);
+                updateDebugInfo(`✅ Candidature caricate: ${candidatureData.length}`);
 
-                updateDebugInfo(`Comuni totali: ${comuniData.length}, Candidature: ${candidatureData.length}`);
+                if (candidatureData.length === 0) {
+                    throw new Error('Nessun dato candidature trovato');
+                }
+
+                // Analizza i codici per debug
+                analyzeJoinCodes();
 
                 // Join dei dati
                 joinData();
@@ -1543,17 +1687,109 @@
                 // Aggiorna la data dell'ultimo aggiornamento
                 updateLastUpdateTime();
                 
+                // Configura gli aggiornamenti automatici
+                setupAutoRefresh();
+                
                 document.getElementById('loading').style.display = 'none';
+                updateDebugInfo(`✅ Caricamento completato! Comuni: ${comuniData.length}, Candidature: ${candidatureData.length}`);
+                
             } catch (error) {
                 console.error('Errore nel caricamento dei dati:', error);
-                document.getElementById('loading').innerHTML = '<div style="color: #EF4444;">Errore nel caricamento dei dati</div>';
+                updateDebugInfo(`❌ Errore: ${error.message}`);
+                document.getElementById('loading').innerHTML = `
+                    <div style="color: #EF4444; text-align: center;">
+                        <h3>Errore nel caricamento dei dati</h3>
+                        <p>${error.message}</p>
+                        <button onclick="loadData()" style="margin-top: 10px; padding: 8px 16px; background: #06B6D4; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Riprova
+                        </button>
+                    </div>
+                `;
+                
+                // Mostra il debug panel per diagnostica
+                const debugPanels = document.querySelectorAll('[id^="debugInfo"]');
+                debugPanels.forEach(panel => {
+                    panel.style.display = 'block';
+                });
             }
+        }
+
+        async function createMockComuniData() {
+            // Crea dati mock per i comuni principali italiani per test
+            const mockData = {
+                type: "FeatureCollection",
+                features: [
+                    {
+                        type: "Feature",
+                        properties: {
+                            pro_com_t: "001001",
+                            comune: "Torino",
+                            den_uts: "Torino",
+                            sigla: "TO",
+                            cod_reg: "1"
+                        },
+                        geometry: {
+                            type: "Point",
+                            coordinates: [7.6869, 45.0703]
+                        }
+                    },
+                    {
+                        type: "Feature", 
+                        properties: {
+                            pro_com_t: "003001",
+                            comune: "Milano", 
+                            den_uts: "Milano",
+                            sigla: "MI",
+                            cod_reg: "3"
+                        },
+                        geometry: {
+                            type: "Point",
+                            coordinates: [9.1900, 45.4642]
+                        }
+                    },
+                    {
+                        type: "Feature",
+                        properties: {
+                            pro_com_t: "012001", 
+                            comune: "Roma",
+                            den_uts: "Roma",
+                            sigla: "RM", 
+                            cod_reg: "12"
+                        },
+                        geometry: {
+                            type: "Point",
+                            coordinates: [12.4964, 41.9028]
+                        }
+                    }
+                ]
+            };
+            
+            return {
+                json: () => Promise.resolve(mockData),
+                ok: true
+            };
+        }
+
+        async function createMockCandidatureData() {
+            // Crea dati mock per le candidature di test
+            const mockCSV = `cod_comune,comune,provincia,regione,avviso,importo_finanziamento
+001001,Torino,Torino,Piemonte,Misura 1.4.1,50000
+003001,Milano,Milano,Lombardia,Misura 1.4.1,75000
+012001,Roma,Roma,Lazio,Misura 1.4.1,100000`;
+            
+            return {
+                text: () => Promise.resolve(mockCSV),
+                ok: true
+            };
         }
 
         function parseCSV(csvText) {
             const lines = csvText.split('\n');
             const headers = parseCSVLine(lines[0]);
             const data = [];
+            
+            console.log('=== HEADER CSV ===');
+            console.log(headers);
             
             for (let i = 1; i < lines.length; i++) {
                 if (lines[i].trim()) {
@@ -1563,6 +1799,7 @@
                         headers.forEach((header, index) => {
                             let value = values[index] || '';
                             
+                            // Formatta il campo cod_comune a 6 cifre
                             if (header === 'cod_comune' && value.trim()) {
                                 value = formatTo6Digits(value);
                             }
@@ -1570,12 +1807,16 @@
                             row[header] = value;
                         });
                         
+                        // Verifica che abbia il campo cod_comune valido
                         if (row.cod_comune && row.cod_comune.trim() && row.cod_comune !== '000000') {
                             data.push(row);
                         }
                     }
                 }
             }
+            
+            console.log('=== PRIME 5 RIGHE CSV ===');
+            console.log(data.slice(0, 5));
             
             return data;
         }
@@ -1607,11 +1848,37 @@
             return result;
         }
 
+        function analyzeJoinCodes() {
+            // Analizza i codici dei comuni per debug
+            const csvCodes = candidatureData.slice(0, 10).map(c => 
+                `${c.cod_comune} (tipo: ${typeof c.cod_comune})`
+            );
+            
+            const jsonCodes = comuniData.slice(0, 10).map(c => 
+                `${c.properties.pro_com_t} (tipo: ${typeof c.properties.pro_com_t})`
+            );
+            
+            console.log('=== ANALISI CODICI COMUNI ===');
+            console.log('Esempi codici CSV:', csvCodes);
+            console.log('Esempi codici JSON:', jsonCodes);
+            
+            // Conta le corrispondenze dirette per codice
+            const csvSet = new Set(candidatureData.map(c => c.cod_comune));
+            const jsonSet = new Set(comuniData.map(c => c.properties.pro_com_t));
+            const intersection = new Set([...csvSet].filter(x => jsonSet.has(x)));
+            
+            console.log('Match diretti per codice:', intersection.size);
+            console.log('Esempi di match diretti:', [...intersection].slice(0, 10));
+            
+            console.log('Codici unici CSV:', csvSet.size);
+            console.log('Codici unici JSON:', jsonSet.size);
+        }
+
         function joinData() {
             const candidaturePerComune = {};
             
             candidatureData.forEach(candidatura => {
-                const codComune = candidatura.cod_comune;
+                const codComune = candidatura.cod_comune; // Già formattato in parseCSV
                 const importo = parseFloat(candidatura.importo_finanziamento) || 0;
                 
                 if (!candidaturePerComune[codComune]) {
@@ -1629,17 +1896,36 @@
                 candidaturePerComune[codComune].numeroProgetti++;
             });
 
+            console.log('=== JOIN SU CODICE COMUNE ===');
             let joinCount = 0;
+            const unmatchedCSV = new Set(Object.keys(candidaturePerComune));
+            const unmatchedJSON = [];
+
             comuniData.forEach(comune => {
-                const codComuneJSON = comune.properties.pro_com_t;
+                const codComuneJSON = comune.properties.pro_com_t; // Già a 6 cifre testuale
                 
                 if (candidaturePerComune[codComuneJSON]) {
                     comune.properties.candidature = candidaturePerComune[codComuneJSON];
+                    unmatchedCSV.delete(codComuneJSON);
                     joinCount++;
+                } else {
+                    unmatchedJSON.push(codComuneJSON);
                 }
             });
 
-            updateDebugInfo(`Join completato: ${joinCount} comuni matchati`);
+            console.log('✅ JOIN COMPLETATO:', joinCount, 'comuni matchati');
+            console.log('❌ CSV non matchati:', unmatchedCSV.size);
+            console.log('❌ JSON non matchati:', unmatchedJSON.length);
+            
+            // Mostra esempi per debugging
+            if (unmatchedCSV.size > 0) {
+                console.log('Esempi CSV non matchati:', [...unmatchedCSV].slice(0, 10));
+            }
+            if (unmatchedJSON.length > 0) {
+                console.log('Esempi JSON non matchati:', unmatchedJSON.slice(0, 10));
+            }
+
+            updateDebugInfo(`✅ JOIN COMPLETATO: ${joinCount} comuni matchati! CSV non matchati: ${unmatchedCSV.size}, JSON non matchati: ${unmatchedJSON.length}`);
         }
 
         function createMapLayer() {
@@ -1669,18 +1955,25 @@
                             showTooltip(e, feature.properties);
                         },
                         mouseout: function(e) {
+                            // Ripristina lo stile base invece di usare resetStyle
                             e.target.setStyle(getBaseStyle(feature));
-                            hideMapTooltip();
+                            hideTooltip();
                         },
                         click: function(e) {
+                            // Mostra informazioni sul comune
                             showComuneInfo(feature.properties);
+                            
+                            // Imposta il filtro del comune selezionato
                             currentFilters.comune = feature.properties.comune;
                             
-                            // Aggiorna i filtri
-                            updateFilterValue('comuneFilter', feature.properties.comune);
-                            updateFilterValue('comuneFilterMobile', feature.properties.comune);
+                            // Aggiorna i filtri sia desktop che mobile
+                            updateFilterValue('comuneSearch', feature.properties.comune);
+                            updateFilterValue('comuneSearchMobile', feature.properties.comune);
                             
+                            // Applica i filtri per aggiornare statistiche e grafico
                             applyFilters();
+                            
+                            // Zoom al comune selezionato
                             map.fitBounds(e.target.getBounds());
                         }
                     });
@@ -1688,10 +1981,34 @@
             }).addTo(map);
         }
 
+        // Funzione helper per aggiornare i valori dei filtri
+        function updateFilterValue(filterId, value) {
+            const filterElement = document.getElementById(filterId);
+            if (filterElement) {
+                if (filterElement.tagName === 'SELECT') {
+                    filterElement.value = value;
+                } else if (filterElement.tagName === 'INPUT') {
+                    filterElement.value = value;
+                    // Mostra clear button se c'è valore
+                    const clearBtnId = filterId.replace('Search', 'Clear');
+                    const clearBtn = document.getElementById(clearBtnId);
+                    if (clearBtn) {
+                        if (value) {
+                            clearBtn.classList.add('show');
+                        } else {
+                            clearBtn.classList.remove('show');
+                        }
+                    }
+                }
+            }
+        }
+
+        // Funzione per calcolare lo stile base di una feature in base ai filtri correnti
         function getBaseStyle(feature) {
             const codReg = feature.properties.cod_reg.toString();
             const hasCandidature = feature.properties.candidature;
             
+            // Verifica se il comune corrisponde ai filtri attivi
             let matchesFilter = true;
             if (currentFilters.regione && feature.properties.candidature && 
                 feature.properties.candidature.regione !== currentFilters.regione) {
@@ -1747,13 +2064,14 @@
                 .style('top', (e.originalEvent.pageY - 28) + 'px');
         }
 
-        function hideMapTooltip() {
+        function hideTooltip() {
             tooltip.transition()
                 .duration(500)
                 .style('opacity', 0);
         }
 
         function showComuneInfo(properties) {
+            // Questa funzione ora crea un popup sulla mappa invece di mostrare nel pannello
             let popupContent = `
                 <div style="color: #2c3e50; font-family: 'Inter', sans-serif;">
                     <h4 style="margin: 0 0 10px 0; color: #1e40af; font-size: 16px;">🏛️ ${properties.comune}</h4>
@@ -1786,6 +2104,7 @@
             
             popupContent += '</div>';
             
+            // Trova il centro del comune sulla mappa per posizionare il popup
             let comuneLayer = null;
             comuniLayer.eachLayer(function(layer) {
                 if (layer.feature.properties.comune === properties.comune) {
@@ -1797,6 +2116,7 @@
                 const bounds = comuneLayer.getBounds();
                 const center = bounds.getCenter();
                 
+                // Mostra popup sulla mappa
                 L.popup({
                     maxWidth: 350,
                     className: 'comune-popup'
@@ -1808,20 +2128,26 @@
         }
 
         function populateFilters() {
+            console.log('=== POPOLAMENTO FILTRI ===');
+            
+            // Popola tutti i filtri inizialmente
             updateFilterOptions();
             
-            // Event listeners per filtri regione
+            // Event listeners per filtri regione (desktop e mobile)
             const regioneFilters = ['regioneFilter', 'regioneFilterMobile'];
             regioneFilters.forEach(filterId => {
                 const el = document.getElementById(filterId);
                 if (el) {
                     el.addEventListener('change', function() {
                         currentFilters.regione = this.value;
+                        // Reset filtri dipendenti
                         currentFilters.provincia = '';
                         currentFilters.comune = '';
                         
+                        // Reset input di ricerca
                         resetSearchInputs();
                         
+                        // Aggiorna entrambi i set di filtri
                         updateFilterValue('regioneFilter', this.value);
                         updateFilterValue('regioneFilterMobile', this.value);
                         
@@ -1831,7 +2157,7 @@
                 }
             });
 
-            // Event listeners per filtri avviso
+            // Event listeners per filtri avviso (desktop e mobile)
             const avvisoFilters = ['avvisoFilter', 'avvisoFilterMobile'];
             avvisoFilters.forEach(filterId => {
                 const el = document.getElementById(filterId);
@@ -1839,6 +2165,7 @@
                     el.addEventListener('change', function() {
                         currentFilters.avviso = this.value;
                         
+                        // Aggiorna entrambi i set di filtri
                         updateFilterValue('avvisoFilter', this.value);
                         updateFilterValue('avvisoFilterMobile', this.value);
                         
@@ -1849,12 +2176,12 @@
         }
 
         function resetSearchInputs() {
-            const searchInputs = ['provinciaFilter', 'provinciaFilterMobile', 'comuneFilter', 'comuneFilterMobile'];
+            const searchInputs = ['provinciaSearch', 'provinciaSearchMobile', 'comuneSearch', 'comuneSearchMobile'];
             searchInputs.forEach(id => {
                 const input = document.getElementById(id);
                 if (input) {
                     input.value = '';
-                    const clearBtnId = id.replace('Filter', 'Clear');
+                    const clearBtnId = id.replace('Search', 'Clear');
                     const clearBtn = document.getElementById(clearBtnId);
                     if (clearBtn) clearBtn.classList.remove('show');
                 }
@@ -1862,6 +2189,7 @@
         }
 
         function updateFilterOptions() {
+            // Filtra i dati in base ai filtri già selezionati
             let filteredData = candidatureData;
             
             if (currentFilters.regione) {
@@ -1870,8 +2198,8 @@
 
             // Aggiorna Province (search inputs)
             const provinceOptions = [...new Set(filteredData.map(c => c.provincia))].sort();
-            updateSearchOptions('provinciaFilter', provinceOptions);
-            updateSearchOptions('provinciaFilterMobile', provinceOptions);
+            updateSearchOptions('provinciaSearch', provinceOptions);
+            updateSearchOptions('provinciaSearchMobile', provinceOptions);
 
             // Filtra ulteriormente per provincia se selezionata
             if (currentFilters.provincia) {
@@ -1880,8 +2208,8 @@
 
             // Aggiorna Comuni (search inputs)
             const comuniOptions = [...new Set(filteredData.map(c => c.comune))].sort();
-            updateSearchOptions('comuneFilter', comuniOptions);
-            updateSearchOptions('comuneFilterMobile', comuniOptions);
+            updateSearchOptions('comuneSearch', comuniOptions);
+            updateSearchOptions('comuneSearchMobile', comuniOptions);
 
             // Regioni (solo la prima volta o quando vuoti)
             if (shouldUpdateSelect('regioneFilter')) {
@@ -1910,24 +2238,31 @@
 
         function updateFilterSelect(selectId, values, selectedValue) {
             const select = document.getElementById(selectId);
-            if (!select) return;
+            if (!select) {
+                console.warn(`Select element with id ${selectId} not found`);
+                return;
+            }
             
             const uniqueValues = [...new Set(values)].sort();
             
+            // Salva l'opzione "Tutti"
             const allOption = select.querySelector('option[value=""]');
             const allOptionText = allOption ? allOption.textContent : '';
             
             select.innerHTML = '';
             
+            // Ricrea l'opzione "Tutti"
             const newAllOption = document.createElement('option');
             newAllOption.value = '';
             newAllOption.textContent = allOptionText || getDefaultOptionText(selectId);
             select.appendChild(newAllOption);
             
+            // Aggiungi le opzioni
             uniqueValues.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
                 
+                // Tronca le etichette lunghe per gli avvisi
                 if (selectId.includes('avviso') && value.length > 50) {
                     option.textContent = value.substring(0, 50) + '...';
                 } else {
@@ -1947,30 +2282,34 @@
             return 'Tutti';
         }
 
-        function updateFilterValue(filterId, value) {
-            const filterElement = document.getElementById(filterId);
-            if (filterElement) {
-                if (filterElement.tagName === 'SELECT') {
-                    filterElement.value = value;
-                } else if (filterElement.tagName === 'INPUT') {
-                    filterElement.value = value;
-                    const clearBtnId = filterId.replace('Filter', 'Clear');
-                    const clearBtn = document.getElementById(clearBtnId);
-                    if (clearBtn) {
-                        if (value) {
-                            clearBtn.classList.add('show');
-                        } else {
-                            clearBtn.classList.remove('show');
-                        }
-                    }
-                }
-            }
-        }
-
         function applyFilters() {
             updateStats();
             updateChart();
             updateMapLayer();
+            zoomToSelection();
+        }
+
+        function zoomToSelection() {
+            const filteredData = getFilteredData();
+            if (filteredData.length === 0) return;
+
+            const comuniCodici = new Set(filteredData.map(c => c.cod_comune));
+            const bounds = [];
+
+            comuniLayer.eachLayer(function(layer) {
+                const codComune = layer.feature.properties.pro_com_t;
+                if (comuniCodici.has(codComune)) {
+                    bounds.push(layer.getBounds());
+                }
+            });
+
+            if (bounds.length > 0) {
+                const group = new L.featureGroup();
+                bounds.forEach(bound => {
+                    group.addLayer(L.rectangle(bound));
+                });
+                map.fitBounds(group.getBounds(), { padding: [20, 20] });
+            }
         }
 
         function getFilteredData() {
@@ -1984,6 +2323,7 @@
         }
 
         function updateMapLayer() {
+            // Aggiorna lo stile di tutti i layer in base ai filtri correnti
             comuniLayer.eachLayer(function(layer) {
                 layer.setStyle(getBaseStyle(layer.feature));
             });
@@ -2010,12 +2350,16 @@
             let title = "";
             let yAxisLabel = "";
             
+            // Modifica dell'ordine di priorità dei filtri per dare precedenza alla provincia sulla regione
             if (currentFilters.comune) {
+                // Mostra gli importi per avviso del comune selezionato
                 title = `💰 Importi finanziati per avviso - Comune: ${currentFilters.comune}`;
                 yAxisLabel = "Avviso";
                 
+                // Filtra i dati per il comune selezionato
                 const filteredData = candidatureData.filter(c => c.comune === currentFilters.comune);
                 
+                // Raggruppa per avviso
                 const avvisiData = {};
                 filteredData.forEach(candidatura => {
                     const avviso = candidatura.avviso;
@@ -2026,18 +2370,23 @@
                     avvisiData[avviso] += importo;
                 });
                 
+                // Converti in array per il grafico
                 chartData = Object.keys(avvisiData).map(avviso => ({
                     name: avviso,
                     value: avvisiData[avviso]
                 }));
                 
+                // Ordina per importo decrescente
                 chartData.sort((a, b) => b.value - a.value);
             } else if (currentFilters.provincia) {
+                // Mostra gli importi per comune della provincia selezionata
                 title = `💰 Importi finanziati per comune - Provincia: ${currentFilters.provincia}`;
                 yAxisLabel = "Comune";
                 
+                // Filtra i dati per la provincia selezionata
                 const filteredData = candidatureData.filter(c => c.provincia === currentFilters.provincia);
                 
+                // Raggruppa per comune
                 const comuniData = {};
                 filteredData.forEach(candidatura => {
                     const comune = candidatura.comune;
@@ -2048,18 +2397,23 @@
                     comuniData[comune] += importo;
                 });
                 
+                // Converti in array per il grafico
                 chartData = Object.keys(comuniData).map(comune => ({
                     name: comune,
                     value: comuniData[comune]
                 }));
                 
+                // Ordina per importo decrescente
                 chartData.sort((a, b) => b.value - a.value);
             } else if (currentFilters.regione) {
+                // Mostra gli importi per provincia della regione selezionata
                 title = `💰 Importi finanziati per provincia - Regione: ${currentFilters.regione}`;
                 yAxisLabel = "Provincia";
                 
+                // Filtra i dati per la regione selezionata
                 const filteredData = candidatureData.filter(c => c.regione === currentFilters.regione);
                 
+                // Raggruppa per provincia
                 const provinceData = {};
                 filteredData.forEach(candidatura => {
                     const provincia = candidatura.provincia;
@@ -2070,16 +2424,47 @@
                     provinceData[provincia] += importo;
                 });
                 
+                // Converti in array per il grafico
                 chartData = Object.keys(provinceData).map(provincia => ({
                     name: provincia,
                     value: provinceData[provincia]
                 }));
                 
+                // Ordina per importo decrescente
+                chartData.sort((a, b) => b.value - a.value);
+            } else if (currentFilters.avviso) {
+                // Mostra gli importi per regione per l'avviso selezionato
+                title = `💰 Importi finanziati per regione - Avviso: ${currentFilters.avviso}`;
+                yAxisLabel = "Regione";
+                
+                // Filtra i dati per l'avviso selezionato
+                const filteredData = candidatureData.filter(c => c.avviso === currentFilters.avviso);
+                
+                // Raggruppa per regione
+                const regioniData = {};
+                filteredData.forEach(candidatura => {
+                    const regione = candidatura.regione;
+                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                    if (!regioniData[regione]) {
+                        regioniData[regione] = 0;
+                    }
+                    regioniData[regione] += importo;
+                });
+                
+                // Converti in array per il grafico
+                chartData = Object.keys(regioniData).map(regione => ({
+                    name: regione,
+                    value: regioniData[regione]
+                }));
+                
+                // Ordina per importo decrescente
                 chartData.sort((a, b) => b.value - a.value);
             } else {
+                // Default: mostra gli importi per regione
                 title = "💰 Importi finanziati per regione";
                 yAxisLabel = "Regione";
                 
+                // Raggruppa per regione
                 const regioniData = {};
                 candidatureData.forEach(candidatura => {
                     const regione = candidatura.regione;
@@ -2090,67 +2475,85 @@
                     regioniData[regione] += importo;
                 });
                 
+                // Converti in array per il grafico
                 chartData = Object.keys(regioniData).map(regione => ({
                     name: regione,
                     value: regioniData[regione]
                 }));
                 
+                // Ordina per importo decrescente
                 chartData.sort((a, b) => b.value - a.value);
             }
             
+            // Aggiorna il titolo del grafico
             document.getElementById("chartTitle").textContent = title;
+            
+            // Disegna il grafico
             drawBarChart(chartData, yAxisLabel);
         }
 
         function drawBarChart(data, yAxisLabel) {
+            // Rimuovi il grafico precedente
             d3.select("#chart").selectAll("*").remove();
             
+            // Calcola l'altezza del grafico in base al numero di elementi
             const barHeight = 30;
             const barPadding = 5;
             const titleHeight = 30;
             const xAxisHeight = 50;
             const chartHeight = Math.max(500, data.length * (barHeight + barPadding) + titleHeight + xAxisHeight);
             
+            // Impostazioni del grafico
             const margin = { top: 20, right: 30, bottom: 70, left: yAxisLabel === "Comune" ? 180 : 150 };
             const chartContainer = document.querySelector(".chart-container");
             const containerWidth = chartContainer.clientWidth;
             const width = containerWidth - margin.left - margin.right;
             const height = chartHeight - margin.top - margin.bottom;
             
+            // Crea l'elemento SVG
             const svg = d3.select("#chart")
                 .attr("width", containerWidth)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
                 .attr("transform", `translate(${margin.left},${margin.top})`);
             
+            // Scala Y
             const y = d3.scaleBand()
                 .range([0, height])
                 .domain(data.map(d => d.name))
                 .padding(0.1);
             
+            // Scala X
             const x = d3.scaleLinear()
                 .range([0, width])
                 .domain([0, d3.max(data, d => d.value)]);
             
+            // Funzione per ottenere il colore della barra
             function getBarColor(d) {
                 if (yAxisLabel === "Regione") {
+                    // Usa i colori delle regioni
                     const regionCode = regionNameToCode[d.name];
                     return regionColors[regionCode] || '#64748B';
                 } else {
+                    // Usa un gradiente per gli altri casi
                     return '#06B6D4';
                 }
             }
             
+            // Funzione per ottenere il colore hover
             function getHoverColor(d) {
                 if (yAxisLabel === "Regione") {
+                    // Usa i colori delle regioni ma più luminosi
                     const regionCode = regionNameToCode[d.name];
                     const baseColor = regionColors[regionCode] || '#64748B';
                     return d3.color(baseColor).brighter(0.3);
                 } else {
+                    // Usa un colore più luminoso per gli altri casi
                     return '#0891B2';
                 }
             }
             
+            // Aggiungi le barre
             svg.selectAll(".bar")
                 .data(data)
                 .enter().append("rect")
@@ -2178,6 +2581,7 @@
                         .style("opacity", 0);
                 });
             
+            // Aggiungi l'asse Y
             svg.append("g")
                 .attr("class", "axis")
                 .call(d3.axisLeft(y))
@@ -2190,6 +2594,7 @@
                 .style("text-anchor", "end")
                 .text(yAxisLabel);
             
+            // Aggiungi l'asse X
             svg.append("g")
                 .attr("class", "axis")
                 .attr("transform", `translate(0,${height})`)
@@ -2202,6 +2607,7 @@
                 .style("text-anchor", "middle")
                 .text("Importo (€)");
             
+            // Aggiungi etichette sulle barre
             svg.selectAll(".label")
                 .data(data)
                 .enter().append("text")
@@ -2233,81 +2639,30 @@
                 avviso: ''
             };
             
+            // Resetta tutti i filtri sia desktop che mobile
             const selectIds = ['regioneFilter', 'avvisoFilter', 'regioneFilterMobile', 'avvisoFilterMobile'];
             selectIds.forEach(id => {
                 updateFilterValue(id, '');
             });
             
+            // Reset input di ricerca
             resetSearchInputs();
             
+            // Nascondi i pannelli di informazioni
             const infoPanels = document.querySelectorAll('[id^="infoPanel"]');
             infoPanels.forEach(panel => {
                 panel.style.display = 'none';
             });
             
+            // Aggiorna filtri e applica
             updateFilterOptions();
             applyFilters();
         }
 
-        function updateLastUpdateTime() {
-            const now = new Date();
-            const formattedDate = now.toLocaleDateString('it-IT', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-            const formattedTime = now.toLocaleTimeString('it-IT', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
-            const lastUpdateElements = document.querySelectorAll('[id^="lastUpdate"]');
-            lastUpdateElements.forEach(element => {
-                element.textContent = `${formattedDate} ${formattedTime}`;
-            });
-        }
-
-        function downloadCSV() {
-            if (candidatureData.length === 0) {
-                alert('Nessun dato disponibile per il download');
-                return;
-            }
-
-            const headers = Object.keys(candidatureData[0]);
-            const csvContent = [
-                headers.join(','),
-                ...candidatureData.map(row => 
-                    headers.map(header => {
-                        const value = row[header] || '';
-                        if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
-                            return `"${value.replace(/"/g, '""')}"`;
-                        }
-                        return value;
-                    }).join(',')
-                )
-            ].join('\n');
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', `pa_digitale_2026_candidature_${new Date().toISOString().split('T')[0]}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }
-        }
-
         function updateDebugInfo(message) {
+            // Aggiorna sia desktop che mobile
             const debugContents = document.querySelectorAll('[id^="debugContent"]');
             debugContents.forEach(content => {
                 content.textContent = message;
             });
         }
-    </script>
-</body>
-</html>
