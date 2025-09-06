@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PA Digitale 2026 - Dashboard</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Font Awesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 350px 1fr 400px;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .left-panel {
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .right-panel {
+            overflow-y: auto;
+        }
+
+        .map-container {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+        }
+
+        .axis text {
+            font-size: 11px;
+            fill: #2c3e50;
+        }
+
+        .axis-label {
+            font-size: 12px;
+            font-weight: 600;
+            fill: #2c3e50;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 200px;
+        }
+
+        .info-panel {
+            background: #f8f9fa;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .info-panel h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .info-item strong {
+            color: #2c3e50;
+        }
+
+        .reset-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #c0392b;
+        }
+
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Aggiunto per l'ultimo aggiornamento */
+        .last-update {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(52, 152, 219, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .last-update label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        #lastUpdate {
+            font-size: 14px;
+            color: #34495e;
+        }
+
+        /* Loghi */
+        .logo-beta {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 80px;
+            height: auto;
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-beta:hover {
+            opacity: 1;
+        }
+
+        .logo-ods {
+            width: 120px;
+            height: auto;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Menu mobile */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            color: #3498db;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -350px;
+            width: 350px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 1000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+            padding: 70px 20px 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-menu.active {
+            left: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #e74c3c;
+            cursor: pointer;
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .container {
+                grid-template-columns: 320px 1fr 380px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 280px 1fr 320px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 10px;
+            }
+            
+            .stat-value {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            .panel {
+                padding: 15px;
+            }
+            
+            .left-panel {
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            
+            .right-panel {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            .stat-card {
+                padding: 8px;
+            }
+            
+            .stat-value {
+                font-size: 16px;
+            }
+            
+            .stat-label {
+                font-size: 11px;
+            }
+            
+            h2 {
+                font-size: 1.1em;
+                margin-bottom: 10px;
+            }
+            
+            h3 {
+                font-size: 1em;
+                margin-bottom: 8px;
+            }
+            
+            .filter-group {
+                margin-bottom: 15px;
+            }
+            
+            .filter-group select {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+            
+            /* Menu mobile */
+            .mobile-menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .left-panel {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 5px;
+                gap: 5px;
+            }
+            
+            .panel {
+                padding: 10px;
+                border-radius: 10px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 5px;
+            }
+            
+            .stat-card {
+                padding: 6px;
+                border-radius: 6px;
+            }
+            
+            .stat-value {
+                font-size: 14px;
+            }
+            
+            .stat-label {
+                font-size: 10px;
+            }
+            
+            .filter-group select {
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+            
+            .info-panel {
+                padding: 10px;
+            }
+            
+            .debug-info {
+                padding: 8px;
+                font-size: 11px;
+            }
+            
+            .tooltip {
+                font-size: 11px;
+                padding: 8px;
+                max-width: 150px;
+            }
+            
+            /* Menu mobile */
+            .mobile-menu {
+                width: 280px;
+                left: -280px;
+                padding: 60px 15px 15px;
+            }
+            
+            .logo-beta {
+                width: 60px;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (pointer: coarse) {
+            .filter-group select {
+                padding: 12px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .reset-btn {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+            
+            .stat-card {
+                min-height: 60px;
+            }
+            
+            .mobile-menu-toggle {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo Beta in basso a sinistra -->
+    <img src="https://palermohub.github.io/cspa/img/beta.png" alt="Logo Beta" class="logo-beta">
+    
+    <!-- Menu mobile toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Menu mobile -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" id="mobileMenuClose">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <!-- Pannello sinistro - Filtri -->
+        <div class="panel left-panel">
+            <!-- Logo ODS prima del titolo filtri -->
+            <img src="https://palermohub.github.io/cspa/img/pa_hub_new.png" alt="Logo ODS" class="logo-ods">
+            
+            <h2>🔍 Filtri</h2>
+            
+            <div class="filter-group">
+                <label for="regioneFilterMobile">Regione</label>
+                <select id="regioneFilterMobile">
+                    <option value="">Tutte le regioni</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="provinciaFilterMobile">Provincia</label>
+                <select id="provinciaFilterMobile">
+                    <option value="">Tutte le province</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="comuneFilterMobile">Comune</label>
+                <select id="comuneFilterMobile">
+                    <option value="">Tutti i comuni</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="avvisoFilterMobile">Avviso</label>
+                <select id="avvisoFilterMobile">
+                    <option value="">Tutti gli avvisi</option>
+                </select>
+            </div>
+
+            <button class="reset-btn" onclick="resetFilters()">Reset Filtri</button>
+
+            <!-- Aggiunto: Data dell'ultimo aggiornamento -->
+            <div class="last-update">
+                <label>Ultimo aggiornamento:</label>
+                <div id="lastUpdateMobile">Caricamento...</div>
+            </div>
+
+            <!-- Pannello info comune selezionato -->
+            <div class="info-panel" id="infoPanelMobile">
+                <h4>📍 Dettagli Comune</h4>
+                <div id="infoContentMobile"></div>
+            </div>
+
+            <!-- Debug info -->
+            <div class="debug-info" id="debugInfoMobile">
+                <strong>Debug Info:</strong><br/>
+                <div id="debugContentMobile">Caricamento...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overlay per menu mobile -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <div class="container">
+        <!-- Pannello sinistro - Filtri -->
+        <div class="panel left-panel" id="desktopLeftPanel">
+            <!-- Logo ODS prima del titolo filtri -->
+            <img src="https://palermohub.github.io/cspa/img/pa_hub_new.png" alt="Logo ODS" class="logo-ods">
+            
+            <h2>🔍 Filtri</h2>
+            
+            <div class="filter-group">
+                <label for="regioneFilter">Regione</label>
+                <select id="regioneFilter">
+                    <option value="">Tutte le regioni</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="provinciaFilter">Provincia</label>
+                <select id="provinciaFilter">
+                    <option value="">Tutte le province</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="comuneFilter">Comune</label>
+                <select id="comuneFilter">
+                    <option value="">Tutti i comuni</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="avvisoFilter">Avviso</label>
+                <select id="avvisoFilter">
+                    <option value="">Tutti gli avvisi</option>
+                </select>
+            </div>
+
+            <button class="reset-btn" onclick="resetFilters()">Reset Filtri</button>
+
+            <!-- Aggiunto: Data dell'ultimo aggiornamento -->
+            <div class="last-update">
+                <label>Ultimo aggiornamento:</label>
+                <div id="lastUpdate">Caricamento...</div>
+            </div>
+
+            <!-- Pannello info comune selezionato -->
+            <div class="info-panel" id="infoPanel">
+                <h4>📍 Dettagli Comune</h4>
+                <div id="infoContent"></div>
+            </div>
+
+            <!-- Debug info -->
+            <div class="debug-info" id="debugInfo">
+                <strong>Debug Info:</strong><br/>
+                <div id="debugContent">Caricamento...</div>
+            </div>
+        </div>
+
+        <!-- Mappa centrale -->
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="loading" id="loading">
+                <div class="loader"></div>
+                <div>Caricamento dati...</div>
+            </div>
+        </div>
+
+        <!-- Pannello destro - Statistiche e grafico -->
+        <div class="panel right-panel">
+            <h2>📊 Statistiche</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statRegioni">-</div>
+                    <div class="stat-label">Regioni con candidature</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statComuni">-</div>
+                    <div class="stat-label">Comuni candidati</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statProgetti">-</div>
+                    <div class="stat-label">Progetti finanziati</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statImporto">-</div>
+                    <div class="stat-label">Importo totale (€)</div>
+                </div>
+            </div>
+
+            <h3 id="chartTitle">💰 Importi finanziati per regione</h3>
+            <div class="chart-container">
+                <svg id="chart" width="100%" height="500"></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Variabili globali
+        let map;
+        let comuniLayer;
+        let comuniData = [];
+        let candidatureData = [];
+        let currentFilters = {
+            regione: '',
+            provincia: '',
+            comune: '',
+            avviso: ''
+        };
+        let tooltip;
+        let updateInterval;
+
+        // Mappatura nomi regioni ai codici per i colori
+        const regionNameToCode = {
+            'Piemonte': '1',
+            'Valle d\'Aosta/Vallée d\'Aoste': '2',
+            'Lombardia': '3',
+            'Trentino-Alto Adige/Südtirol': '4',
+            'Veneto': '5',
+            'Friuli-Venezia Giulia': '6',
+            'Liguria': '7',
+            'Emilia-Romagna': '8',
+            'Toscana': '9',
+            'Umbria': '10',
+            'Marche': '11',
+            'Lazio': '12',
+            'Abruzzo': '13',
+            'Molise': '14',
+            'Campania': '15',
+            'Puglia': '16',
+            'Basilicata': '17',
+            'Calabria': '18',
+            'Sicilia': '19',
+            'Sardegna': '20'
+        };
+
+        // Palette di 20 colori distinti per le regioni
+        const regionColors = {
+            '1': '#FF6B6B',   // Piemonte - Rosso
+            '2': '#4ECDC4',   // Valle d'Aosta - Turchese
+            '3': '#45B7D1',   // Lombardia - Blu
+            '4': '#96CEB4',   // Trentino-Alto Adige - Verde menta
+            '5': '#FFEAA7',   // Veneto - Giallo
+            '6': '#DDA0DD',   // Friuli-Venezia Giulia - Lavanda
+            '7': '#98D8C8',   // Liguria - Verde acqua
+            '8': '#F7DC6F',   // Emilia-Romagna - Oro
+            '9': '#BB8FCE',   // Toscana - Viola
+            '10': '#85C1E9',  // Umbria - Azzurro
+            '11': '#F8C471',  // Marche - Arancione
+            '12': '#82E0AA',  // Lazio - Verde chiaro
+            '13': '#F1948A',  // Abruzzo - Rosa
+            '14': '#D7BDE2',  // Molise - Lilla
+            '15': '#A9DFBF',  // Campania - Verde pastello
+            '16': '#F9E79F',  // Puglia - Giallo pastello
+            '17': '#D5A6BD',  // Basilicata - Rosa antico
+            '18': '#AED6F1',  // Calabria - Azzurro pastello
+            '19': '#FAD7A0',  // Sicilia - Pesca
+            '20': '#ABEBC6'   // Sardegna - Verde smeraldo
+        };
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup menu mobile
+            setupMobileMenu();
+            
+            initMap();
+            loadData();
+            setupTooltip();
+            
+            // Gestisce il resize per responsiveness del grafico
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                    updateChart();
+                }, 250);
+            });
+        });
+
+        // Funzione per configurare il menu mobile
+        function setupMobileMenu() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuClose = document.getElementById('mobileMenuClose');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            
+            // Apri menu mobile
+            mobileMenuToggle.addEventListener('click', function() {
+                mobileMenu.classList.add('active');
+                mobileOverlay.classList.add('active');
+            });
+            
+            // Chiudi menu mobile
+            function closeMobileMenu() {
+                mobileMenu.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+            }
+            
+            mobileMenuClose.addEventListener('click', closeMobileMenu);
+            mobileOverlay.addEventListener('click', closeMobileMenu);
+        }
+
+        function initMap() {
+            map = L.map('map').setView([41.9028, 12.4964], 6);
+            
+            // Mappa CartoDB Light
+            L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors, © CartoDB',
+                subdomains: 'abcd',
+                maxZoom: 18
+            }).addTo(map);
+        }
+
+        function setupTooltip() {
+            tooltip = d3.select('body').append('div')
+                .attr('class', 'tooltip')
+                .style('opacity', 0);
+        }
+
+        // Funzione per formattare i codici a 6 cifre con zeri iniziali
+        function formatTo6Digits(code) {
+            // Converti in stringa se non lo è già
+            let codeStr = String(code).trim();
+            
+            // Rimuovi eventuali zeri iniziali e poi riaggiungili per avere 6 cifre
+            const numericValue = parseInt(codeStr, 10);
+            if (!isNaN(numericValue)) {
+                codeStr = numericValue.toString().padStart(6, '0');
+            }
+            
+            return codeStr;
+        }
+
+        // Funzione per aggiornare la data dell'ultimo aggiornamento
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('it-IT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const formattedTime = now.toLocaleTimeString('it-IT', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Aggiorna sia desktop che mobile
+            const lastUpdateElements = document.querySelectorAll('[id^="lastUpdate"]');
+            lastUpdateElements.forEach(element => {
+                element.textContent = `${formattedDate} ${formattedTime}`;
+            });
+        }
+
+        // Funzione per configurare gli aggiornamenti automatici
+        function setupAutoRefresh() {
+            // Cancella eventuali intervalli precedenti
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+            
+            // Controlla ogni minuto se è ora di aggiornare
+            updateInterval = setInterval(() => {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                
+                // Aggiorna alle 8:00, 13:00 e 18:00
+                if ((hours === 8 && minutes === 0) || 
+                    (hours === 13 && minutes === 0) || 
+                    (hours === 18 && minutes === 0)) {
+                    refreshData();
+                }
+            }, 60000); // Controlla ogni minuto
+        }
+
+        // Funzione per aggiornare i dati
+        function refreshData() {
+            document.getElementById('loading').style.display = 'block';
+            loadData();
+        }
+
+        async function loadData() {
+            try {
+                // Carica dati comuni JSON
+                const comuniResponse = await fetch('https://palermohub.github.io/Pa-Digitale-2026/pmtiles/comuni_italiani_2025_2.json');
+                const comuniGeoJSON = await comuniResponse.json();
+                comuniData = comuniGeoJSON.features;
+
+                // Carica dati candidature CSV - NUOVA FONTE DATI
+                const candidatureResponse = await fetch('https://query.data.world/s/yxkuwlvmx4oxyngoeera3kf4awaje3?dws=00000');
+                const candidatureCSV = await candidatureResponse.text();
+                candidatureData = parseCSV(candidatureCSV);
+
+                updateDebugInfo(`Comuni totali: ${comuniData.length}, Candidature: ${candidatureData.length}`);
+
+                // Analizza i codici per debug
+                analyzeJoinCodes();
+
+                // Join dei dati
+                joinData();
+                
+                // Crea layer mappa
+                createMapLayer();
+                
+                // Popola filtri
+                populateFilters();
+                
+                // Aggiorna statistiche e grafico
+                updateStats();
+                updateChart();
+                
+                // Aggiorna la data dell'ultimo aggiornamento
+                updateLastUpdateTime();
+                
+                // Configura gli aggiornamenti automatici
+                setupAutoRefresh();
+                
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Errore nel caricamento dei dati:', error);
+                document.getElementById('loading').innerHTML = '<div style="color: red;">Errore nel caricamento dei dati</div>';
+            }
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const headers = parseCSVLine(lines[0]);
+            const data = [];
+            
+            console.log('=== HEADER CSV ===');
+            console.log(headers);
+            
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim()) {
+                    const values = parseCSVLine(lines[i]);
+                    if (values.length >= headers.length) {
+                        const row = {};
+                        headers.forEach((header, index) => {
+                            let value = values[index] || '';
+                            
+                            // Formatta il campo cod_comune a 6 cifre
+                            if (header === 'cod_comune' && value.trim()) {
+                                value = formatTo6Digits(value);
+                            }
+                            
+                            row[header] = value;
+                        });
+                        
+                        // Verifica che abbia il campo cod_comune valido
+                        if (row.cod_comune && row.cod_comune.trim() && row.cod_comune !== '000000') {
+                            data.push(row);
+                        }
+                    }
+                }
+            }
+            
+            console.log('=== PRIME 5 RIGHE CSV ===');
+            console.log(data.slice(0, 5));
+            
+            return data;
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        current += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+
+        function analyzeJoinCodes() {
+            // Analizza i codici dei comuni per debug
+            const csvCodes = candidatureData.slice(0, 10).map(c => 
+                `${c.cod_comune} (tipo: ${typeof c.cod_comune})`
+            );
+            
+            const jsonCodes = comuniData.slice(0, 10).map(c => 
+                `${c.properties.pro_com_t} (tipo: ${typeof c.properties.pro_com_t})`
+            );
+            
+            console.log('=== ANALISI CODICI COMUNI ===');
+            console.log('Esempi codici CSV:', csvCodes);
+            console.log('Esempi codici JSON:', jsonCodes);
+            
+            // Conta le corrispondenze dirette per codice
+            const csvSet = new Set(candidatureData.map(c => c.cod_comune));
+            const jsonSet = new Set(comuniData.map(c => c.properties.pro_com_t));
+            const intersection = new Set([...csvSet].filter(x => jsonSet.has(x)));
+            
+            console.log('Match diretti per codice:', intersection.size);
+            console.log('Esempi di match diretti:', [...intersection].slice(0, 10));
+            
+            console.log('Codici unici CSV:', csvSet.size);
+            console.log('Codici unici JSON:', jsonSet.size);
+        }
+
+        function joinData() {
+            const candidaturePerComune = {};
+            
+            candidatureData.forEach(candidatura => {
+                const codComune = candidatura.cod_comune; // Già formattato in parseCSV
+                const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                
+                if (!candidaturePerComune[codComune]) {
+                    candidaturePerComune[codComune] = {
+                        candidature: [],
+                        totaleImporto: 0,
+                        numeroProgetti: 0,
+                        regione: candidatura.regione,
+                        provincia: candidatura.provincia,
+                        comune: candidatura.comune
+                    };
+                }
+                candidaturePerComune[codComune].candidature.push(candidatura);
+                candidaturePerComune[codComune].totaleImporto += importo;
+                candidaturePerComune[codComune].numeroProgetti++;
+            });
+
+            console.log('=== JOIN SU CODICE COMUNE ===');
+            let joinCount = 0;
+            const unmatchedCSV = new Set(Object.keys(candidaturePerComune));
+            const unmatchedJSON = [];
+
+            comuniData.forEach(comune => {
+                const codComuneJSON = comune.properties.pro_com_t; // Già a 6 cifre testuale
+                
+                if (candidaturePerComune[codComuneJSON]) {
+                    comune.properties.candidature = candidaturePerComune[codComuneJSON];
+                    unmatchedCSV.delete(codComuneJSON);
+                    joinCount++;
+                } else {
+                    unmatchedJSON.push(codComuneJSON);
+                }
+            });
+
+            console.log('✅ JOIN COMPLETATO:', joinCount, 'comuni matchati');
+            console.log('❌ CSV non matchati:', unmatchedCSV.size);
+            console.log('❌ JSON non matchati:', unmatchedJSON.length);
+            
+            // Mostra esempi per debugging
+            if (unmatchedCSV.size > 0) {
+                console.log('Esempi CSV non matchati:', [...unmatchedCSV].slice(0, 10));
+            }
+            if (unmatchedJSON.length > 0) {
+                console.log('Esempi JSON non matchati:', unmatchedJSON.slice(0, 10));
+            }
+
+            updateDebugInfo(`✅ JOIN COMPLETATO: ${joinCount} comuni matchati! CSV non matchati: ${unmatchedCSV.size}, JSON non matchati: ${unmatchedJSON.length}`);
+        }
+
+        function createMapLayer() {
+            if (comuniLayer) {
+                map.removeLayer(comuniLayer);
+            }
+
+            comuniLayer = L.geoJSON(comuniData, {
+                style: function(feature) {
+                    const codReg = feature.properties.cod_reg.toString();
+                    const hasCandidature = feature.properties.candidature;
+                    
+                    return {
+                        fillColor: regionColors[codReg] || '#888888',
+                        weight: 0, // Nessun bordo
+                        opacity: 1,
+                        color: 'transparent',
+                        fillOpacity: hasCandidature ? 0.8 : 0.3
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    // Aggiungi una proprietà per tracciare se il layer è attivo
+                    layer.options.isActive = true;
+                    
+                    layer.on({
+                        mouseover: function(e) {
+                            // Controlla se il layer è attivo prima di applicare gli effetti
+                            if (!e.target.options.isActive) return;
+                            
+                            const layer = e.target;
+                            layer.setStyle({
+                                weight: 2,
+                                color: '#333',
+                                opacity: 1,
+                                fillOpacity: 1
+                            });
+                            
+                            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                                layer.bringToFront();
+                            }
+
+                            showTooltip(e, feature.properties);
+                        },
+                        mouseout: function(e) {
+                            // Controlla se il layer è attivo prima di applicare gli effetti
+                            if (!e.target.options.isActive) return;
+                            
+                            comuniLayer.resetStyle(e.target);
+                            hideTooltip();
+                        },
+                        click: function(e) {
+                            // Controlla se il layer è attivo prima di applicare gli effetti
+                            if (!e.target.options.isActive) return;
+                            
+                            showComuneInfo(feature.properties);
+                            map.fitBounds(e.target.getBounds());
+                        }
+                    });
+                }
+            }).addTo(map);
+        }
+
+        function showTooltip(e, properties) {
+            const comune = properties.comune;
+            const provincia = properties.den_uts;
+            const candidature = properties.candidature;
+            
+            let content = `<strong>${comune}</strong><br/>Provincia: ${provincia}`;
+            
+            if (candidature) {
+                content += `<br/>Progetti: ${candidature.numeroProgetti}`;
+                content += `<br/>Importo: €${candidature.totaleImporto.toLocaleString('it-IT')}`;
+            } else {
+                content += '<br/>Nessun progetto finanziato';
+            }
+
+            tooltip.transition()
+                .duration(200)
+                .style('opacity', 0.9);
+            tooltip.html(content)
+                .style('left', (e.originalEvent.pageX + 10) + 'px')
+                .style('top', (e.originalEvent.pageY - 28) + 'px');
+        }
+
+        function hideTooltip() {
+            tooltip.transition()
+                .duration(500)
+                .style('opacity', 0);
+        }
+
+        function showComuneInfo(properties) {
+            // Mostra informazioni sia su desktop che mobile
+            const infoPanels = document.querySelectorAll('[id^="infoPanel"]');
+            const infoContents = document.querySelectorAll('[id^="infoContent"]');
+            
+            let html = `
+                <div class="info-item"><strong>Comune:</strong> ${properties.comune}</div>
+                <div class="info-item"><strong>Provincia:</strong> ${properties.den_uts} (${properties.sigla})</div>
+            `;
+            
+            if (properties.candidature) {
+                html += `
+                    <div class="info-item"><strong>Progetti finanziati:</strong> ${properties.candidature.numeroProgetti}</div>
+                    <div class="info-item"><strong>Importo totale:</strong> €${properties.candidature.totaleImporto.toLocaleString('it-IT')}</div>
+                `;
+                
+                const avvisi = {};
+                properties.candidature.candidature.forEach(c => {
+                    if (!avvisi[c.avviso]) {
+                        avvisi[c.avviso] = { count: 0, importo: 0 };
+                    }
+                    avvisi[c.avviso].count++;
+                    avvisi[c.avviso].importo += parseFloat(c.importo_finanziamento) || 0;
+                });
+                
+                html += '<div style="margin-top: 10px;"><strong>Dettaglio per avviso:</strong></div>';
+                Object.keys(avvisi).forEach(avviso => {
+                    const shortAvviso = avviso.length > 30 ? avviso.substring(0, 30) + '...' : avviso;
+                    html += `<div class="info-item" style="font-size: 11px;">• ${shortAvviso}: ${avvisi[avviso].count} progetti, €${avvisi[avviso].importo.toLocaleString('it-IT')}</div>`;
+                });
+            } else {
+                html += '<div class="info-item">Nessun progetto finanziato per questo comune</div>';
+            }
+            
+            infoContents.forEach(content => {
+                content.innerHTML = html;
+            });
+            
+            infoPanels.forEach(panel => {
+                panel.style.display = 'block';
+            });
+        }
+
+        function populateFilters() {
+            // Popola tutti i filtri inizialmente
+            updateFilterOptions();
+            
+            // Event listeners per filtri a cascata (desktop)
+            setupFilterListeners('regioneFilter', 'provinciaFilter', 'comuneFilter', 'avvisoFilter');
+            
+            // Event listeners per filtri a cascata (mobile)
+            setupFilterListeners('regioneFilterMobile', 'provinciaFilterMobile', 'comuneFilterMobile', 'avvisoFilterMobile');
+        }
+
+        function setupFilterListeners(regioneId, provinciaId, comuneId, avvisoId) {
+            document.getElementById(regioneId).addEventListener('change', function() {
+                currentFilters.regione = this.value;
+                // Reset filtri dipendenti
+                currentFilters.provincia = '';
+                currentFilters.comune = '';
+                
+                // Aggiorna entrambi i set di filtri
+                document.getElementById(provinciaId).value = '';
+                document.getElementById(comuneId).value = '';
+                
+                const otherProvinciaId = provinciaId === 'provinciaFilter' ? 'provinciaFilterMobile' : 'provinciaFilter';
+                const otherComuneId = comuneId === 'comuneFilter' ? 'comuneFilterMobile' : 'comuneFilter';
+                
+                document.getElementById(otherProvinciaId).value = '';
+                document.getElementById(otherComuneId).value = '';
+                
+                updateFilterOptions();
+                applyFilters();
+            });
+
+            document.getElementById(provinciaId).addEventListener('change', function() {
+                currentFilters.provincia = this.value;
+                // Reset filtri dipendenti
+                currentFilters.comune = '';
+                
+                // Aggiorna entrambi i set di filtri
+                document.getElementById(comuneId).value = '';
+                
+                const otherComuneId = comuneId === 'comuneFilter' ? 'comuneFilterMobile' : 'comuneFilter';
+                document.getElementById(otherComuneId).value = '';
+                
+                updateFilterOptions();
+                applyFilters();
+            });
+
+            document.getElementById(comuneId).addEventListener('change', function() {
+                currentFilters.comune = this.value;
+                applyFilters();
+            });
+
+            document.getElementById(avvisoId).addEventListener('change', function() {
+                currentFilters.avviso = this.value;
+                applyFilters();
+            });
+        }
+
+        function updateFilterOptions() {
+            // Filtra i dati in base ai filtri già selezionati
+            let filteredData = candidatureData;
+            
+            if (currentFilters.regione) {
+                filteredData = filteredData.filter(c => c.regione === currentFilters.regione);
+            }
+            if (currentFilters.provincia) {
+                filteredData = filteredData.filter(c => c.provincia === currentFilters.provincia);
+            }
+
+            // Aggiorna Province (desktop e mobile)
+            updateFilterSelect('provinciaFilter', filteredData.map(c => c.provincia), currentFilters.provincia);
+            updateFilterSelect('provinciaFilterMobile', filteredData.map(c => c.provincia), currentFilters.provincia);
+
+            // Aggiorna Comuni (desktop e mobile)
+            updateFilterSelect('comuneFilter', filteredData.map(c => c.comune), currentFilters.comune);
+            updateFilterSelect('comuneFilterMobile', filteredData.map(c => c.comune), currentFilters.comune);
+
+            // Regioni (solo la prima volta)
+            if (document.getElementById('regioneFilter').children.length === 1) {
+                updateFilterSelect('regioneFilter', candidatureData.map(c => c.regione), currentFilters.regione);
+                updateFilterSelect('regioneFilterMobile', candidatureData.map(c => c.regione), currentFilters.regione);
+            }
+
+            // Avvisi (solo la prima volta)
+            if (document.getElementById('avvisoFilter').children.length === 1) {
+                updateFilterSelect('avvisoFilter', candidatureData.map(c => c.avviso), currentFilters.avviso);
+                updateFilterSelect('avvisoFilterMobile', candidatureData.map(c => c.avviso), currentFilters.avviso);
+            }
+        }
+
+        function updateFilterSelect(selectId, values, selectedValue) {
+            const select = document.getElementById(selectId);
+            const uniqueValues = [...new Set(values)].sort();
+            
+            // Salva l'opzione "Tutti"
+            const allOption = select.querySelector('option[value=""]');
+            select.innerHTML = '';
+            select.appendChild(allOption);
+            
+            // Aggiungi le opzioni
+            uniqueValues.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                
+                // Tronca le etichette lunghe per gli avvisi
+                if (selectId.includes('avviso') && value.length > 50) {
+                    option.textContent = value.substring(0, 50) + '...';
+                } else {
+                    option.textContent = value;
+                }
+                
+                if (value === selectedValue) option.selected = true;
+                select.appendChild(option);
+            });
+        }
+
+        function applyFilters() {
+            updateStats();
+            updateChart();
+            updateMapLayer();
+            zoomToSelection();
+        }
+
+        function zoomToSelection() {
+            const filteredData = getFilteredData();
+            if (filteredData.length === 0) return;
+
+            const comuniCodici = new Set(filteredData.map(c => c.cod_comune));
+            const bounds = [];
+
+            comuniLayer.eachLayer(function(layer) {
+                const codComune = layer.feature.properties.pro_com_t;
+                if (comuniCodici.has(codComune)) {
+                    bounds.push(layer.getBounds());
+                }
+            });
+
+            if (bounds.length > 0) {
+                const group = new L.featureGroup();
+                bounds.forEach(bound => {
+                    group.addLayer(L.rectangle(bound));
+                });
+                map.fitBounds(group.getBounds(), { padding: [20, 20] });
+            }
+        }
+
+        function getFilteredData() {
+            return candidatureData.filter(candidatura => {
+                if (currentFilters.regione && candidatura.regione !== currentFilters.regione) return false;
+                if (currentFilters.provincia && candidatura.provincia !== currentFilters.provincia) return false;
+                if (currentFilters.comune && candidatura.comune !== currentFilters.comune) return false;
+                if (currentFilters.avviso && candidatura.avviso !== currentFilters.avviso) return false;
+                return true;
+            });
+        }
+
+        function updateMapLayer() {
+            const filteredData = getFilteredData();
+            const comuniConCandidature = new Set(filteredData.map(c => c.cod_comune));
+            
+            // Verifica se c'è un filtro geografico attivo
+            const hasGeoFilter = currentFilters.regione || currentFilters.provincia || currentFilters.comune;
+            
+            comuniLayer.eachLayer(function(layer) {
+                const codComune = layer.feature.properties.pro_com_t;
+                const hasCandidature = comuniConCandidature.has(codComune);
+                const codReg = layer.feature.properties.cod_reg.toString();
+                
+                // Se c'è un filtro geografico attivo, mostra solo i poligoni corrispondenti
+                if (hasGeoFilter) {
+                    // Determina se questo poligono corrisponde ai filtri attivi
+                    let showPolygon = false;
+                    
+                    // Controlla se corrisponde al filtro regione
+                    if (currentFilters.regione) {
+                        showPolygon = layer.feature.properties.regione === currentFilters.regione;
+                    }
+                    
+                    // Controlla se corrisponde al filtro provincia (solo se non già escluso)
+                    if (showPolygon || !currentFilters.regione) {
+                        if (currentFilters.provincia) {
+                            showPolygon = layer.feature.properties.den_uts === currentFilters.provincia;
+                        }
+                    }
+                    
+                    // Controlla se corrisponde al filtro comune (solo se non già escluso)
+                    if (showPolygon || (!currentFilters.regione && !currentFilters.provincia)) {
+                        if (currentFilters.comune) {
+                            showPolygon = layer.feature.properties.comune === currentFilters.comune;
+                        }
+                    }
+                    
+                    // Imposta la proprietà isActive per il controllo degli eventi
+                    layer.options.isActive = showPolygon;
+                    
+                    if (showPolygon) {
+                        layer.setStyle({
+                            fillColor: regionColors[codReg] || '#888888',
+                            fillOpacity: hasCandidature ? 0.8 : 0.3,
+                            weight: 0,
+                            opacity: 1
+                        });
+                    } else {
+                        // Nascondi completamente i poligoni non corrispondenti
+                        layer.setStyle({
+                            fillColor: regionColors[codReg] || '#888888',
+                            fillOpacity: 0,
+                            weight: 0,
+                            opacity: 0
+                        });
+                    }
+                } else {
+                    // Nessun filtro geografico attivo, mostra tutti i poligoni
+                    layer.options.isActive = true;
+                    layer.setStyle({
+                        fillColor: regionColors[codReg] || '#888888',
+                        fillOpacity: hasCandidature ? 0.8 : 0.2,
+                        weight: 0,
+                        opacity: 1
+                    });
+                }
+            });
+        }
+
+        function updateStats() {
+            const filteredData = getFilteredData();
+            
+            const regioni = new Set(filteredData.map(c => c.regione)).size;
+            const comuni = new Set(filteredData.map(c => c.comune)).size;
+            const progetti = filteredData.length;
+            const importoTotale = filteredData.reduce((sum, c) => {
+                return sum + (parseFloat(c.importo_finanziamento) || 0);
+            }, 0);
+
+            document.getElementById('statRegioni').textContent = regioni;
+            document.getElementById('statComuni').textContent = comuni;
+            document.getElementById('statProgetti').textContent = progetti;
+            document.getElementById('statImporto').textContent = formatCurrency(importoTotale);
+        }
+
+        function updateChart() {
+            let chartData = [];
+            let title = "";
+            let yAxisLabel = "";
+            
+            // Determina il tipo di grafico in base ai filtri selezionati
+            if (currentFilters.comune) {
+                // Mostra gli importi per avviso del comune selezionato
+                title = `💰 Importi finanziati per avviso - Comune: ${currentFilters.comune}`;
+                yAxisLabel = "Avviso";
+                
+                // Filtra i dati per il comune selezionato
+                const filteredData = candidatureData.filter(c => c.comune === currentFilters.comune);
+                
+                // Raggruppa per avviso
+                const avvisiData = {};
+                filteredData.forEach(candidatura => {
+                    const avviso = candidatura.avviso;
+                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                    
+                    if (!avvisiData[avviso]) {
+                        avvisiData[avviso] = 0;
+                    }
+                    avvisiData[avviso] += importo;
+                });
+                
+                // Converti in array per il grafico
+                chartData = Object.keys(avvisiData)
+                    .map(avviso => ({
+                        key: avviso,
+                        label: avviso.length > 30 ? avviso.substring(0, 30) + '...' : avviso,
+                        importo: avvisiData[avviso],
+                        color: '#3498db' // Colore unico per gli avvisi
+                    }))
+                    .sort((a, b) => b.importo - a.importo);
+            } 
+            else if (currentFilters.provincia) {
+                // Mostra gli importi per comune della provincia selezionata
+                title = `💰 Importi finanziati per comune - Provincia: ${currentFilters.provincia}`;
+                yAxisLabel = "Comune";
+                
+                // Filtra i dati per la provincia selezionata
+                let filteredData = candidatureData.filter(c => c.provincia === currentFilters.provincia);
+                
+                // Applica anche il filtro avviso se presente
+                if (currentFilters.avviso) {
+                    filteredData = filteredData.filter(c => c.avviso === currentFilters.avviso);
+                }
+                
+                // Raggruppa per comune
+                const comuniData = {};
+                filteredData.forEach(candidatura => {
+                    const comune = candidatura.comune;
+                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                    
+                    if (!comuniData[comune]) {
+                        comuniData[comune] = 0;
+                    }
+                    comuniData[comune] += importo;
+                });
+                
+                // Converti in array per il grafico
+                chartData = Object.keys(comuniData)
+                    .map(comune => ({
+                        key: comune,
+                        label: comune,
+                        importo: comuniData[comune],
+                        color: '#2ecc71' // Colore unico per i comuni
+                    }))
+                    .sort((a, b) => b.importo - a.importo);
+            } 
+            else if (currentFilters.regione) {
+                // Mostra gli importi per provincia della regione selezionata
+                title = `💰 Importi finanziati per provincia - Regione: ${currentFilters.regione}`;
+                yAxisLabel = "Provincia";
+                
+                // Filtra i dati per la regione selezionata
+                let filteredData = candidatureData.filter(c => c.regione === currentFilters.regione);
+                
+                // Applica anche il filtro avviso se presente
+                if (currentFilters.avviso) {
+                    filteredData = filteredData.filter(c => c.avviso === currentFilters.avviso);
+                }
+                
+                // Raggruppa per provincia
+                const provinceData = {};
+                filteredData.forEach(candidatura => {
+                    const provincia = candidatura.provincia;
+                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                    
+                    if (!provinceData[provincia]) {
+                        provinceData[provincia] = 0;
+                    }
+                    provinceData[provincia] += importo;
+                });
+                
+                // Converti in array per il grafico
+                chartData = Object.keys(provinceData)
+                    .map(provincia => ({
+                        key: provincia,
+                        label: provincia,
+                        importo: provinceData[provincia],
+                        color: '#9b59b6' // Colore unico per le province
+                    }))
+                    .sort((a, b) => b.importo - a.importo);
+            } 
+            else {
+                // Mostra gli importi per regione (comportamento predefinito)
+                title = "💰 Importi finanziati per regione";
+                yAxisLabel = "Regione";
+                
+                // Filtra i dati per l'avviso se presente
+                let filteredData = candidatureData;
+                if (currentFilters.avviso) {
+                    filteredData = candidatureData.filter(c => c.avviso === currentFilters.avviso);
+                }
+                
+                // Raggruppa per regione
+                const regioniData = {};
+                filteredData.forEach(candidatura => {
+                    const regione = candidatura.regione;
+                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                    
+                    if (!regioniData[regione]) {
+                        regioniData[regione] = 0;
+                    }
+                    regioniData[regione] += importo;
+                });
+                
+                // Converti in array per il grafico
+                chartData = Object.keys(regioniData)
+                    .map(regione => ({
+                        key: regione,
+                        label: regione,
+                        importo: regioniData[regione],
+                        color: regionColors[regionNameToCode[regione]] || '#3498db' // Usa i colori delle regioni
+                    }))
+                    .sort((a, b) => b.importo - a.importo);
+            }
+            
+            // Aggiorna il titolo del grafico
+            document.getElementById('chartTitle').textContent = title;
+            
+            // Disegna il grafico
+            drawChart(chartData, yAxisLabel);
+        }
+
+        function drawChart(data, yAxisLabel) {
+            const svg = d3.select('#chart');
+            svg.selectAll('*').remove();
+
+            if (data.length === 0) return;
+
+            // Calcola dimensioni responsive
+            const container = document.querySelector('.chart-container');
+            const containerWidth = container.offsetWidth;
+            const isMobile = window.innerWidth <= 992;
+            
+            const margin = { 
+                top: 20, 
+                right: isMobile ? 10 : 20, 
+                bottom: 60, 
+                left: isMobile ? 80 : 100 
+            };
+            
+            const width = containerWidth - margin.left - margin.right;
+            const height = Math.max(isMobile ? 300 : 400, data.length * (isMobile ? 20 : 25)) - margin.top - margin.bottom;
+
+            // Aggiorna l'altezza dell'SVG
+            svg.attr('width', containerWidth)
+               .attr('height', height + margin.top + margin.bottom);
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.importo)])
+                .range([0, width]);
+
+            const y = d3.scaleBand()
+                .domain(data.map(d => d.key))
+                .range([0, height])
+                .padding(0.1);
+
+            // Bars
+            g.selectAll('.bar')
+                .data(data)
+                .enter().append('rect')
+                .attr('class', 'bar')
+                .attr('x', 0)
+                .attr('y', d => y(d.key))
+                .attr('width', d => x(d.importo))
+                .attr('height', y.bandwidth())
+                .attr('fill', d => d.color)
+                .style('transition', 'all 0.3s ease')
+                .on('mouseover', function(event, d) {
+                    d3.select(this).style('opacity', 0.8);
+                    tooltip.transition()
+                        .duration(200)
+                        .style('opacity', 0.9);
+                    tooltip.html(`<strong>${d.label}</strong><br/>€${d.importo.toLocaleString('it-IT')}`)
+                        .style('left', (event.pageX + 10) + 'px')
+                        .style('top', (event.pageY - 28) + 'px');
+                })
+                .on('mouseout', function() {
+                    d3.select(this).style('opacity', 1);
+                    tooltip.transition()
+                        .duration(500)
+                        .style('opacity', 0);
+                });
+
+            // Y Axis
+            g.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(y).tickFormat(d => {
+                    // Trova l'etichetta corrispondente alla chiave
+                    const item = data.find(item => item.key === d);
+                    return item ? item.label : d;
+                }))
+                .selectAll('text')
+                .style('font-size', isMobile ? '10px' : '11px');
+
+            // X Axis
+            g.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x)
+                    .ticks(isMobile ? 3 : 5)
+                    .tickFormat(d => formatCurrency(d)))
+                .selectAll('text')
+                .style('font-size', isMobile ? '9px' : '11px');
+
+            // Aggiungi etichetta per l'asse Y
+            if (!isMobile && yAxisLabel) {
+                g.append('text')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', 0 - margin.left)
+                    .attr('x', 0 - (height / 2))
+                    .attr('dy', '1em')
+                    .style('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .style('fill', '#2c3e50')
+                    .text(yAxisLabel);
+            }
+
+            // Labels (solo su desktop per evitare sovrapposizioni)
+            if (!isMobile) {
+                g.selectAll('.bar-label')
+                    .data(data)
+                    .enter().append('text')
+                    .attr('class', 'bar-label')
+                    .attr('x', d => x(d.importo) + 5)
+                    .attr('y', d => y(d.key) + y.bandwidth() / 2)
+                    .attr('dy', '0.35em')
+                    .style('font-size', '10px')
+                    .style('fill', '#2c3e50')
+                    .text(d => formatCurrency(d.importo));
+            }
+        }
+
+        function formatCurrency(value) {
+            if (value >= 1000000) {
+                return (value / 1000000).toFixed(1) + 'M';
+            } else if (value >= 1000) {
+                return (value / 1000).toFixed(0) + 'K';
+            }
+            return value.toLocaleString('it-IT');
+        }
+
+        function updateDebugInfo(message) {
+            // Aggiorna sia desktop che mobile
+            const debugContents = document.querySelectorAll('[id^="debugContent"]');
+            debugContents.forEach(content => {
+                content.innerHTML = message;
+                
+                // Aggiungi anche alcuni esempi per l'analisi manuale
+                const csvExamples = candidatureData.slice(0, 3).map(c => 
+                    `${c.cod_comune} (${c.comune}, ${c.provincia})`
+                ).join('<br/>');
+                
+                const jsonExamples = comuniData.slice(0, 3).map(c => 
+                    `${c.properties.pro_com_t} (${c.properties.comune}, ${c.properties.den_uts})`
+                ).join('<br/>');
+                
+                content.innerHTML += `<br/><br/><strong>Esempi CSV:</strong><br/>${csvExamples}`;
+                content.innerHTML += `<br/><br/><strong>Esempi JSON:</strong><br/>${jsonExamples}`;
+            });
+        }
+
+        function resetFilters() {
+            // Resetta tutti i filtri sia desktop che mobile
+            const filterIds = [
+                'regioneFilter', 'provinciaFilter', 'comuneFilter', 'avvisoFilter',
+                'regioneFilterMobile', 'provinciaFilterMobile', 'comuneFilterMobile', 'avvisoFilterMobile'
+            ];
+            
+            filterIds.forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            
+            currentFilters = {
+                regione: '',
+                provincia: '',
+                comune: '',
+                avviso: ''
+            };
+
+            updateFilterOptions();
+            updateStats();
+            updateChart();
+            updateMapLayer();
+            
+            // Nascondi i pannelli di informazioni
+            const infoPanels = document.querySelectorAll('[id^="infoPanel"]');
+            infoPanels.forEach(panel => {
+                panel.style.display = 'none';
+            });
+            
+            map.setView([41.9028, 12.4964], 6);
+        }
+    </script>
+</body>
+</html>
