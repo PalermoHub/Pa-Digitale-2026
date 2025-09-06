@@ -360,113 +360,6 @@
             font-weight: 500;
         }
 
-        /* Nuovo stile per la sezione dati e licenze */
-        .data-sources {
-            margin-top: 24px;
-            padding: 20px;
-            background: linear-gradient(145deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
-            border-radius: 16px;
-            border-left: 4px solid #10B981;
-            backdrop-filter: blur(10px);
-        }
-
-        .data-sources h4 {
-            color: #F1F5F9;
-            margin-bottom: 16px;
-            font-weight: 700;
-            font-size: 1em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .sources-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .source-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .source-item:hover {
-            transform: translateY(-2px);
-            background: rgba(15, 23, 42, 0.8);
-            border-color: rgba(6, 182, 212, 0.3);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .source-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            color: white;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        .github-icon {
-            background: linear-gradient(135deg, #24292E, #0D1117);
-        }
-
-        .license-icon {
-            background: linear-gradient(135deg, #FF6B35, #F7931E);
-        }
-
-        .download-icon {
-            background: linear-gradient(135deg, #10B981, #059669);
-        }
-
-        .source-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .source-title {
-            font-weight: 600;
-            color: #F1F5F9;
-            font-size: 14px;
-            margin-bottom: 4px;
-            line-height: 1.3;
-        }
-
-        .source-description {
-            font-size: 12px;
-            color: #CBD5E1;
-            opacity: 0.9;
-            line-height: 1.4;
-        }
-
-        .download-btn {
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            color: inherit;
-            font-family: inherit;
-        }
-
-        .download-btn:hover .source-item {
-            transform: translateY(-2px);
-            background: rgba(15, 23, 42, 0.8);
-            border-color: rgba(16, 185, 129, 0.3);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
         .logo-beta {
             position: fixed;
             bottom: 24px;
@@ -774,28 +667,6 @@
                 max-height: 150px !important;
                 padding: 12px;
             }
-
-            .sources-grid {
-                gap: 8px;
-            }
-
-            .source-item {
-                padding: 10px;
-            }
-
-            .source-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
-
-            .source-title {
-                font-size: 12px;
-            }
-
-            .source-description {
-                font-size: 11px;
-            }
         }
 
         /* Stile popup comune */
@@ -906,47 +777,9 @@
             <div id="lastUpdateMobile">Caricamento...</div>
         </div>
 
-        <!-- Nuova sezione: Dati e Licenze (Mobile) -->
-        <div class="data-sources">
-            <h4><i class="fas fa-database"></i> Dati e Licenze</h4>
-            <div class="sources-grid">
-                <a href="https://github.com/teamdigitale/padigitale2026-opendata" target="_blank" rel="noopener noreferrer" class="source-item">
-                    <div class="source-icon github-icon">
-                        <i class="fab fa-github"></i>
-                    </div>
-                    <div class="source-content">
-                        <div class="source-title">Repository GitHub</div>
-                        <div class="source-description">Team Digitale - PA Digitale 2026 OpenData</div>
-                    </div>
-                </a>
-                
-                <a href="https://creativecommons.org/licenses/by/4.0/deed.it" target="_blank" rel="noopener noreferrer" class="source-item">
-                    <div class="source-icon license-icon">
-                        <i class="fab fa-creative-commons"></i>
-                    </div>
-                    <div class="source-content">
-                        <div class="source-title">Licenza CC BY 4.0</div>
-                        <div class="source-description">Creative Commons - Attribuzione 4.0 Internazionale</div>
-                    </div>
-                </a>
-                
-                <button class="download-btn" onclick="downloadCSV()">
-                    <div class="source-item">
-                        <div class="source-icon download-icon">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <div class="source-content">
-                            <div class="source-title">Scarica Dati CSV</div>
-                            <div class="source-description">Candidature PA Digitale 2026 in formato CSV</div>
-                        </div>
-                    </div>
-                </button>
-            </div>
-        </div>
-
         <!-- Pannello info comune selezionato -->
         <div class="info-panel" id="infoPanelMobile">
-            <h4>🏛️ Dettagli Comune</h4>
+            <h4>🔍 Dettagli Comune</h4>
             <div id="infoContentMobile"></div>
         </div>
 
@@ -1004,47 +837,9 @@
                 <div id="lastUpdate">Caricamento...</div>
             </div>
 
-            <!-- Nuova sezione: Dati e Licenze -->
-            <div class="data-sources">
-                <h4><i class="fas fa-database"></i> Dati e Licenze</h4>
-                <div class="sources-grid">
-                    <a href="https://github.com/teamdigitale/padigitale2026-opendata" target="_blank" rel="noopener noreferrer" class="source-item">
-                        <div class="source-icon github-icon">
-                            <i class="fab fa-github"></i>
-                        </div>
-                        <div class="source-content">
-                            <div class="source-title">Repository GitHub</div>
-                            <div class="source-description">Team Digitale - PA Digitale 2026 OpenData</div>
-                        </div>
-                    </a>
-                    
-                    <a href="https://creativecommons.org/licenses/by/4.0/deed.it" target="_blank" rel="noopener noreferrer" class="source-item">
-                        <div class="source-icon license-icon">
-                            <i class="fab fa-creative-commons"></i>
-                        </div>
-                        <div class="source-content">
-                            <div class="source-title">Licenza CC BY 4.0</div>
-                            <div class="source-description">Creative Commons - Attribuzione 4.0 Internazionale</div>
-                        </div>
-                    </a>
-                    
-                    <button class="download-btn" onclick="downloadCSV()">
-                        <div class="source-item">
-                            <div class="source-icon download-icon">
-                                <i class="fas fa-download"></i>
-                            </div>
-                            <div class="source-content">
-                                <div class="source-title">Scarica Dati CSV</div>
-                                <div class="source-description">Candidature PA Digitale 2026 in formato CSV</div>
-                            </div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
             <!-- Pannello info comune selezionato -->
             <div class="info-panel" id="infoPanel">
-                <h4>🏛️ Dettagli Comune</h4>
+                <h4>🔍 Dettagli Comune</h4>
                 <div id="infoContent"></div>
             </div>
 
@@ -1248,7 +1043,7 @@
 
         // Funzione per formattare i codici a 6 cifre con zeri iniziali
         function formatTo6Digits(code) {
-            // Converti in stringa se non lo è già  
+            // Converti in stringa se non lo è già 
             let codeStr = String(code).trim();
             
             // Rimuovi eventuali zeri iniziali e poi riaggiungili per avere 6 cifre
@@ -1306,48 +1101,6 @@
         function refreshData() {
             document.getElementById('loading').style.display = 'block';
             loadData();
-        }
-
-        // Funzione per scaricare i dati CSV
-        function downloadCSV() {
-            if (candidatureData.length === 0) {
-                alert('Nessun dato disponibile per il download');
-                return;
-            }
-
-            // Converte i dati in formato CSV
-            const headers = Object.keys(candidatureData[0]);
-            const csvContent = [
-                headers.join(','),
-                ...candidatureData.map(row => 
-                    headers.map(header => {
-                        const value = row[header] || '';
-                        // Escape virgolette e racchiudi in virgolette se contiene virgole o virgolette
-                        if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
-                            return `"${value.replace(/"/g, '""')}"`;
-                        }
-                        return value;
-                    }).join(',')
-                )
-            ].join('\n');
-
-            // Crea un blob e scarica il file
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', `pa_digitale_2026_candidature_${new Date().toISOString().split('T')[0]}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            } else {
-                alert('Il tuo browser non supporta il download automatico. Copia il contenuto CSV dalla console.');
-                console.log(csvContent);
-            }
         }
 
         async function loadData() {
