@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	 <title>PA Digitale 2026 - Dashboard by @opendatasicilia</title>
+     <title>PA Digitale 2026 - Dashboard by @opendatasicilia</title>
     <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,40 +13,42 @@
     <meta name="author" content="Giovan Battista Vitrano per OpenDataSicilia.it">
     <meta http-equiv="content-language" content="IT">
     <meta name="robots" content="index,follow">
-    <meta name="creation_Date" content="06/09/2025>
+    <meta name="creation_Date" content="06/09/2025">
     <link rel="shortcut icon" href="favicon.ico"/> 
-	<link rel="icon" href="favicon.png" type="image/png"/> 
-	    <!-- Meta tags per social sharing pen Graph Protocol -->
+    <link rel="icon" href="favicon.png" type="image/png"/> 
+    
+    <!-- Preload ottimizzato -->
+    <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    
+    <!-- Meta tags per social sharing -->
     <meta property="og:url" content="https://palermohub.github.io/Pa-Digitale-2026/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="PA Digitale 2026 - Dashboard by @opendatasicilia">
     <meta property="og:description" content="Palermo Hub - Contenitore di mappe su Palermo realizzato da OpenDataSicilia.it">
     <meta property="og:image" content="https://palermohub.github.io/Pa-Digitale-2026/img/social_card.jpg">
-	<!-- twitter -->
+    
+    <!-- twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="palermohub.opendatasicilia.it">
     <meta property="twitter:url" content="https://palermohub.github.io/Pa-Digitale-2026/">
     <meta name="twitter:title" content="PA Digitale 2026 - Dashboard by @opendatasicilia">
     <meta name="twitter:description" content="Palermo Hub - Contenitore di mappe su Palermo realizzato da OpenDataSicilia.it">
     <meta name="twitter:image" content="https://palermohub.github.io/Pa-Digitale-2026/img/social_card.jpg">
-       <!-- app CSS -->
-    <link rel="stylesheet" href="css/pa_digitale.css" />
-    <!-- Leaflet CSS -->
+    
+    <!-- CSS ottimizzato -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- D3.js -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- Font Awesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-87653723-4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-87653723-4');
-</script>	
-	
+    <link rel="stylesheet" href="css/pa_digitale_ott.css" />
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-87653723-4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-87653723-4');
+    </script>	
 </head>
 <body>
     <!-- Logo Beta in basso a sinistra -->
@@ -115,9 +117,8 @@
                 <strong>Fonte dati:</strong> Team Digitale - PA Digitale 2026 OpenData<br/>
                 <strong>Licenza:</strong> Creative Commons BY 4.0<br/>
                 <strong>Aggiornamento:</strong> Quotidiano automatico dal repository GitHub ufficiale<br/>
-				 <strong>Rielaborazione dati:</strong> <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> by <a href="https://x.com/opendatasicilia" title="@opendatasicilia" target="_blank">@opendatasicilia</a> - 2025<br/>
-				<strong>Sviluppo tecnico:</strong> Applicazione web sviluppata attraverso una collaborazione human-<a href="https://claude.ai" target="_blank">Claude AI (Anthropic)</a> e <a href="https://chat.z.ai/" target="_blank"> chatbot Z.ai</a>, che hanno supportato la progettazione dell'architettura modulare, l'ottimizzazione del codice e l'implementazione di funzionalità avanzate.
-				
+                 <strong>Rielaborazione dati:</strong> <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> by <a href="https://x.com/opendatasicilia" title="@opendatasicilia" target="_blank">@opendatasicilia</a> - 2025<br/>
+                <strong>Sviluppo tecnico:</strong> Applicazione web sviluppata attraverso una collaborazione human-<a href="https://claude.ai" target="_blank">Claude AI (Anthropic)</a> e <a href="https://chat.z.ai/" target="_blank"> chatbot Z.ai</a>, che hanno supportato la progettazione dell'architettura modulare, l'ottimizzazione del codice e l'implementazione di funzionalità avanzate.
             </div>
         </div>
     </div>
@@ -172,7 +173,7 @@
         
         <!-- Logo ODS -->
         <img src="https://palermohub.github.io/cspa/img/pa_hub_new.png" alt="Logo ODS" class="logo-ods">
-		 <h2>PA Digitale 2026 PNRR - Candidature Finanziate (Comuni)</h2>
+         <h2>PA Digitale 2026 PNRR - Candidature Finanziate (Comuni)</h2>
         
         <h3><i class="fa-solid fa-filter"></i>  Filtri</h3>
         
@@ -262,6 +263,19 @@
                         </div>
                     </div>
                 </button>
+                
+                <!-- Pulsante per pulire la cache -->
+                <button class="download-btn" onclick="clearCache()">
+                    <div class="source-item">
+                        <div class="source-icon download-icon">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                        <div class="source-content">
+                            <div class="source-title">Pulisci Cache</div>
+                            <div class="source-description">Ricarica i dati più recenti dal server</div>
+                        </div>
+                    </div>
+                </button>
             </div>
         </div>
 
@@ -287,7 +301,7 @@
             <!-- Logo ODS prima del titolo filtri -->
             <img src="https://raw.githubusercontent.com/SiciliaHub/palermohub/PH-release-v2.0/legend/pa_hub_new_white.png" alt="Logo ODS" class="logo-ods">
             <h2>PA Digitale 2026 PNRR </h2> 
-			<p>Candidature dei Comuni confermate e finanziate nel PNRR con i fondi dedicati alla digitalizzazione della Pubblica Amministrazione -  PA digitale 2026 </p><br>
+            <p>Candidature dei Comuni confermate e finanziate nel PNRR con i fondi dedicati alla digitalizzazione della Pubblica Amministrazione -  PA digitale 2026 </p><br>
             <h3><i class="fa-solid fa-filter"></i> Filtri</h3>
             
             <div class="filter-group">
@@ -376,6 +390,19 @@
                             </div>
                         </div>
                     </button>
+                    
+                    <!-- Pulsante per pulire la cache -->
+                    <button class="download-btn" onclick="clearCache()">
+                        <div class="source-item">
+                            <div class="source-icon download-icon">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <div class="source-content">
+                                <div class="source-title">Pulisci Cache</div>
+                                <div class="source-description">Ricarica i dati più recenti dal server</div>
+                            </div>
+                        </div>
+                    </button>
                 </div>
             </div>
 
@@ -450,9 +477,9 @@
         </div>
     </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- app js -->
-<script src="js/pa_digitale.js"></script>
+<!-- Script ottimizzati con defer -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="https://d3js.org/d3.v7.min.js" defer></script>
+<script src="js/pa_digitale_ott.js" defer></script>
 </body>
 </html>
