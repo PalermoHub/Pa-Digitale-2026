@@ -1,4 +1,5 @@
-// Variabili globali
+
+        // Variabili globali
         let map;
         let comuniLayer;
         let comuniData = [];
@@ -28,18 +29,6 @@
         function closeInfoModal() {
             document.getElementById('infoModal').classList.remove('active');
             document.body.style.overflow = '';
-        }
-
-        // Funzione per creare link CUP
-        function createCupLink(cupCode) {
-            if (!cupCode || cupCode === '-' || cupCode.trim() === '') {
-                return '-';
-            }
-            
-            const baseUrl = 'https://www.opencup.gov.it/portale/it/web/opencup/home/progetto/-/cup/';
-            const fullUrl = baseUrl + encodeURIComponent(cupCode);
-            
-            return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: none; font-weight: 500;" title="Apri dettaglio progetto OpenCUP">${cupCode}</a>`;
         }
 
         // Mappatura nomi regioni ai codici per i colori
@@ -169,14 +158,11 @@
                 const avviso = record.avviso.length > 50 ? 
                     record.avviso.substring(0, 50) + '...' : record.avviso;
                 
-                // Crea link per il codice CUP
-                const cupLink = createCupLink(record.codice_cup);
-                
                 row.innerHTML = `
                     <td title="${record.regione}">${record.regione}</td>
                     <td title="${record.provincia}">${record.provincia}</td>
                     <td title="${record.comune}">${record.comune}</td>
-                    <td title="${record.codice_cup}">${cupLink}</td>
+                    <td title="${record.codice_cup}">${record.codice_cup}</td>
                     <td title="${record.avviso}">${avviso}</td>
                     <td title="${dataInvio}">${dataInvio}</td>
                     <td title="${dataFinanziamento}">${dataFinanziamento}</td>
@@ -605,7 +591,7 @@
             map = L.map('map', {
                 zoomControl: false, // Disabilita controlli di default
                 maxBounds: italyBounds,
-                maxBoundsViscosity: 0.8, // Permette un po' di elasticità  
+                maxBoundsViscosity: 0.8, // Permette un po' di elasticità 
                 minZoom: 5,  // Permette di vedere tutta l'Italia
                 maxZoom: 16
             }).setView(initialCenter, initialZoom); // Mantieni lo zoom originale
@@ -879,114 +865,107 @@
                 .style('opacity', 0);
         }
 
-        function showComuneInfo(properties) {
-            let popupContent = `
-                <div style="color: #2c3e50; font-family: 'Inter', sans-serif; min-width: 400px;">
-                    <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 12px; margin: -16px -16px 16px -16px; border-radius: 12px 12px 0 0;">
-                        <h4 style="margin: 0; font-size: 16px; font-weight: 600;">🏛️ ${properties.comune}</h4>
-                        <div style="font-size: 13px; opacity: 0.9; margin-top: 4px;">${properties.den_uts} (${properties.sigla})</div>
-                    </div>
+function showComuneInfo(properties) {
+    let popupContent = `
+        <div style="color: #2c3e50; font-family: 'Inter', sans-serif; min-width: 400px;">
+            <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 12px; margin: -16px -16px 16px -16px; border-radius: 12px 12px 0 0;">
+                <h4 style="margin: 0; font-size: 16px; font-weight: 600;">🏛️ ${properties.comune}</h4>
+                <div style="font-size: 13px; opacity: 0.9; margin-top: 4px;">${properties.den_uts} (${properties.sigla})</div>
+            </div>
+    `;
+    
+    if (properties.candidature) {
+        popupContent += `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <div style="background: #f8fafc; padding: 8px; border-radius: 8px; text-align: center; border-left: 3px solid #10b981;">
+                    <div style="font-size: 18px; font-weight: 700; color: #10b981;">${properties.candidature.numeroProgetti}</div>
+                    <div style="font-size: 11px; color: #64748b;">Progetti</div>
+                </div>
+                <div style="background: #f8fafc; padding: 8px; border-radius: 8px; text-align: center; border-left: 3px solid #3b82f6;">
+                    <div style="font-size: 14px; font-weight: 700; color: #3b82f6;">€${properties.candidature.totaleImporto.toLocaleString('it-IT')}</div>
+                    <div style="font-size: 11px; color: #64748b;">Importo totale</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 16px;">
+                <h5 style="margin: 0 0 12px 0; font-size: 14px; color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">📋 Dettaglio Progetti</h5>
+                <div style="max-height: 420px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f1f5f9;">
+                                <th style="padding: 8px 4px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #cbd5e1;">CUP</th>
+                                <th style="padding: 8px 4px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #cbd5e1;">Avviso</th>
+                                <th style="padding: 8px 4px; text-align: right; font-weight: 600; color: #475569; border-bottom: 2px solid #cbd5e1;">Importo</th>
+                                <th style="padding: 8px 4px; text-align: center; font-weight: 600; color: #475569; border-bottom: 2px solid #cbd5e1;">Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+        
+        // Ordina le candidature per importo decrescente
+        const candidatureOrdered = [...properties.candidature.candidature].sort((a, b) => 
+            (parseFloat(b.importo_finanziamento) || 0) - (parseFloat(a.importo_finanziamento) || 0)
+        );
+        
+        candidatureOrdered.forEach((candidatura, index) => {
+            const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+            const avvisoShort = candidatura.avviso.length > 30 ? 
+                candidatura.avviso.substring(0, 30) + '...' : candidatura.avviso;
+            const dataFinanziamento = candidatura.data_finanziamento ? 
+                new Date(candidatura.data_finanziamento).toLocaleDateString('it-IT') : '-';
+            const cupCode = candidatura.codice_cup || '-';
+            
+            const rowBg = index % 2 === 0 ? '#ffffff' : '#f8fafc';
+            
+            popupContent += `
+                <tr style="background: ${rowBg}; transition: background 0.2s;">
+                    <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-family: monospace; font-size: 10px; color: #6366f1;" title="${cupCode}">${cupCode}</td>
+                    <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; line-height: 1.3;" title="${candidatura.avviso}">${avvisoShort}</td>
+                    <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 600; color: #059669;">€${importo.toLocaleString('it-IT')}</td>
+                    <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 10px; color: #64748b;">${dataFinanziamento}</td>
+                </tr>
             `;
-            
-            if (properties.candidature) {
-                popupContent += `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                        <div style="background: #f8fafc; padding: 8px; border-radius: 8px; text-align: center; border-left: 3px solid #10b981;">
-                            <div style="font-size: 18px; font-weight: 700; color: #10b981;">${properties.candidature.numeroProgetti}</div>
-                            <div style="font-size: 11px; color: #64748b;">Progetti</div>
-                        </div>
-                        <div style="background: #f8fafc; padding: 8px; border-radius: 8px; text-align: center; border-left: 3px solid #3b82f6;">
-                            <div style="font-size: 14px; font-weight: 700; color: #3b82f6;">€${properties.candidature.totaleImporto.toLocaleString('it-IT')}</div>
-                            <div style="font-size: 11px; color: #64748b;">Importo totale</div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 16px;">
-                        <h5 style="margin: 0 0 12px 0; font-size: 14px; color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;"><i class='fa-solid fa-list'></i> Dettaglio Progetti</h5>
-                        <div style="max-height: 420px; overflow-y: auto;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                                <thead>
-                                    <tr style="background: #f1f5f9;">
-                                        <th style="padding: 8px 4px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #cbd5e1;">CUP</th>
-                                        <th style="padding: 8px 4px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #cbd5e1;">Avviso</th>
-                                        <th style="padding: 8px 4px; text-align: right; font-weight: 600; color: #475569; border-bottom: 2px solid #cbd5e1;">Importo</th>
-                                        <th style="padding: 8px 4px; text-align: center; font-weight: 600; color: #475569; border-bottom: 2px solid #cbd5e1;">Data</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                `;
-                
-                // Ordina le candidature per importo decrescente
-                const candidatureOrdered = [...properties.candidature.candidature].sort((a, b) => 
-                    (parseFloat(b.importo_finanziamento) || 0) - (parseFloat(a.importo_finanziamento) || 0)
-                );
-                
-                candidatureOrdered.forEach((candidatura, index) => {
-                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
-                    const avvisoShort = candidatura.avviso.length > 30 ? 
-                        candidatura.avviso.substring(0, 30) + '...' : candidatura.avviso;
-                    const dataFinanziamento = candidatura.data_finanziamento ? 
-                        new Date(candidatura.data_finanziamento).toLocaleDateString('it-IT') : '-';
-                    const cupCode = candidatura.codice_cup || '-';
-                    
-                    const rowBg = index % 2 === 0 ? '#ffffff' : '#f8fafc';
-                    
-                    // Crea il link CUP per il popup - versione semplificata per HTML inline
-                    let cupDisplay = cupCode;
-                    if (cupCode && cupCode !== '-' && cupCode.trim() !== '') {
-                        const cupUrl = 'https://www.opencup.gov.it/portale/it/web/opencup/home/progetto/-/cup/' + encodeURIComponent(cupCode);
-                        cupDisplay = `<a href="${cupUrl}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: none; font-weight: 500;" title="Apri dettaglio progetto OpenCUP">${cupCode}</a>`;
-                    }
-                    
-                    popupContent += `
-                        <tr style="background: ${rowBg}; transition: background 0.2s;">
-                            <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-family: monospace; font-size: 10px; color: #6366f1;" title="${cupCode}">${cupDisplay}</td>
-                            <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; line-height: 1.3;" title="${candidatura.avviso}">${avvisoShort}</td>
-                            <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 600; color: #059669;">€${importo.toLocaleString('it-IT')}</td>
-                            <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 10px; color: #64748b;">${dataFinanziamento}</td>
-                        </tr>
-                    `;
-                });
-                
-                popupContent += `
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-            } else {
-                popupContent += `
-                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; text-align: center;">
-                        <div style="color: #dc2626; font-weight: 500;">Nessun progetto finanziato</div>
-                        <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">Questo comune non ha candidature confermate</div>
-                    </div>
-                `;
-            }
-            
-            popupContent += '</div>';
-            
-            let comuneLayer = null;
-            comuniLayer.eachLayer(function(layer) {
-                if (layer.feature.properties.comune === properties.comune) {
-                    comuneLayer = layer;
-                }
-            });
-            
-            if (comuneLayer) {
-                const bounds = comuneLayer.getBounds();
-                const center = bounds.getCenter();
-                
-                L.popup({
-                    maxWidth: 500,
-                    className: 'comune-popup',
-                    autoPan: true,
-                    autoPanPadding: [20, 20]
-                })
-                .setLatLng(center)
-                .setContent(popupContent)
-                .openOn(map);
-            }
+        });
+        
+        popupContent += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    } else {
+        popupContent += `
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="color: #dc2626; font-weight: 500;">Nessun progetto finanziato</div>
+                <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">Questo comune non ha candidature confermate</div>
+            </div>
+        `;
+    }
+    
+    popupContent += '</div>';
+    
+    let comuneLayer = null;
+    comuniLayer.eachLayer(function(layer) {
+        if (layer.feature.properties.comune === properties.comune) {
+            comuneLayer = layer;
         }
+    });
+    
+    if (comuneLayer) {
+        const bounds = comuneLayer.getBounds();
+        const center = bounds.getCenter();
+        
+        L.popup({
+            maxWidth: 500,
+            className: 'comune-popup',
+            autoPan: true,
+            autoPanPadding: [20, 20]
+        })
+        .setLatLng(center)
+        .setContent(popupContent)
+        .openOn(map);
+    }
+}
 
         function populateFilters() {
             updateFilterOptions();
@@ -1319,7 +1298,7 @@
                     }));
                     
                     chartData.sort((a, b) => b.value - a.value);
-                    // Limita ai primi 50 comuni per leggibilità  
+                    // Limita ai primi 50 comuni per leggibilità 
                     chartData = chartData.slice(0, 50);
                     break;
                     
@@ -1585,3 +1564,4 @@
                 content.textContent = message;
             });
         }
+
