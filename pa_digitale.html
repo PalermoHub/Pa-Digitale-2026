@@ -392,17 +392,29 @@
             font-weight: 600;
         }
 
-        .reset-btn {
-            background: linear-gradient(135deg, #EF4444, #DC2626);
-            color: white;
+        /* Stili per i pulsanti di azione */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .reset-btn, .table-btn {
             border: none;
             padding: 12px 20px;
             border-radius: 12px;
             cursor: pointer;
-            margin-top: 16px;
             transition: all 0.3s ease;
             font-weight: 600;
             font-size: 14px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
             box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.3);
         }
 
@@ -410,6 +422,243 @@
             background: linear-gradient(135deg, #DC2626, #B91C1C);
             transform: translateY(-2px);
             box-shadow: 0 8px 25px 0 rgba(239, 68, 68, 0.4);
+        }
+
+        .table-btn {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.3);
+        }
+
+        .table-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(16, 185, 129, 0.4);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95));
+            border-radius: 24px;
+            padding: 32px;
+            width: 95vw;
+            height: 85vh;
+            max-width: 1200px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(148, 163, 184, 0.2);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 2px solid rgba(6, 182, 212, 0.3);
+            padding-bottom: 16px;
+        }
+
+        .modal-title {
+            color: #F1F5F9;
+            font-size: 1.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #06B6D4, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #EF4444;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .modal-content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .modal-info {
+            color: #CBD5E1;
+            font-size: 14px;
+        }
+
+        .download-filtered-btn {
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+        }
+
+        .download-filtered-btn:hover {
+            background: linear-gradient(135deg, #2563EB, #1D4ED8);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.4);
+        }
+
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #06B6D4, #3B82F6);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s ease;
+        }
+
+        .data-table th:hover {
+            background: linear-gradient(135deg, #0891B2, #2563EB);
+        }
+
+        .data-table th::after {
+            content: '↕';
+            margin-left: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+        }
+
+        .data-table th.sort-asc::after {
+            content: '↑';
+            color: white;
+        }
+
+        .data-table th.sort-desc::after {
+            content: '↓';
+            color: white;
+        }
+
+        .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            color: #E2E8F0;
+            word-break: break-word;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: rgba(30, 41, 59, 0.3);
+        }
+
+        .data-table tr:hover {
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #E2E8F0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: rgba(6, 182, 212, 0.2);
+            border-color: rgba(6, 182, 212, 0.5);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
+            background: linear-gradient(135deg, #06B6D4, #3B82F6);
+            border-color: transparent;
+            color: white;
+        }
+
+        .pagination-info {
+            color: #CBD5E1;
+            font-size: 12px;
+            margin: 0 16px;
         }
 
         .debug-info {
@@ -791,6 +1040,30 @@
             .chart-container {
                 max-height: 200px !important;
             }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .modal {
+                width: 98vw;
+                height: 90vh;
+                padding: 20px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .data-table {
+                font-size: 11px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 4px;
+            }
         }
 
         @media (max-width: 576px) {
@@ -886,6 +1159,29 @@
             .source-description {
                 font-size: 11px;
             }
+
+            .modal {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .data-table {
+                font-size: 10px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 6px 2px;
+            }
+
+            .pagination {
+                gap: 4px;
+            }
+
+            .pagination-btn {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
         }
 
         /* Stile popup comune */
@@ -912,7 +1208,7 @@
                 font-size: 16px;
             }
             
-            .reset-btn {
+            .reset-btn, .table-btn {
                 padding: 14px 24px;
                 font-size: 16px;
             }
@@ -962,6 +1258,48 @@
     <button class="mobile-menu-toggle" id="mobileMenuToggle">
         <i class="fas fa-bars"></i>
     </button>
+    
+    <!-- Modal per tabella dati -->
+    <div class="modal-overlay" id="dataModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">📊 Tabella dati filtrati</h2>
+                <button class="modal-close" onclick="closeDataModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="modal-actions">
+                    <div class="modal-info">
+                        <span id="tableRecordCount">0 record trovati</span>
+                    </div>
+                    <button class="download-filtered-btn" onclick="downloadFilteredCSV()">
+                        <i class="fas fa-download"></i> Scarica Dati Filtrati
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('regione')">Regione</th>
+                                <th onclick="sortTable('provincia')">Provincia</th>
+                                <th onclick="sortTable('comune')">Comune</th>
+                                <th onclick="sortTable('codice_cup')">Codice CUP</th>
+                                <th onclick="sortTable('avviso')">Avviso</th>
+                                <th onclick="sortTable('data_invio_candidatura')">Data Invio</th>
+                                <th onclick="sortTable('data_finanziamento')">Data Finanziamento</th>
+                                <th onclick="sortTable('importo_finanziamento')">Importo (€)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="tablePagination">
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Menu mobile -->
     <div class="mobile-menu" id="mobileMenu">
@@ -1013,7 +1351,12 @@
             </select>
         </div>
 
-        <button class="reset-btn" onclick="resetFilters()">Reset Filtri</button>
+        <div class="action-buttons">
+            <button class="reset-btn" onclick="resetFilters()">Reset</button>
+            <button class="table-btn" onclick="openDataModal()">
+                <i class="fas fa-table"></i> Mostra Tabella
+            </button>
+        </div>
 
         <!-- Data dell'ultimo aggiornamento -->
         <div class="last-update">
@@ -1122,7 +1465,12 @@
                 </select>
             </div>
 
-            <button class="reset-btn" onclick="resetFilters()">Reset Filtri</button>
+            <div class="action-buttons">
+                <button class="reset-btn" onclick="resetFilters()" title="Reset Filtri"> <i class="fas fa-refresh"></i> Reset</button>
+                <button class="table-btn" onclick="openDataModal()" title="Mostra Tabella Dati">
+                    <i class="fas fa-table"></i> Tabella
+                </button>
+            </div>
 
             <!-- Aggiunto: Data dell'ultimo aggiornamento -->
             <div class="last-update">
@@ -1132,7 +1480,7 @@
 
             <!-- Nuova sezione: Dati e Licenze -->
             <div class="data-sources">
-                <h4><i class="fas fa-database"></i> Dati e Licenze</h4>
+                <h4><i class="fa-solid fa-database"></i>  Dati e  Licenze <i class="fa-solid fa-closed-captioning"></i> </h4>
                 <div class="sources-grid">
                     <a href="https://github.com/teamdigitale/padigitale2026-opendata" target="_blank" rel="noopener noreferrer" class="source-item">
                         <div class="source-icon github-icon">
@@ -1252,6 +1600,13 @@
         let tooltip;
         let updateInterval;
 
+        // Variabili per la tabella dati
+        let currentTableData = [];
+        let tableSortColumn = '';
+        let tableSortDirection = 'asc';
+        let currentPage = 1;
+        let recordsPerPage = 50;
+
         // Mappatura nomi regioni ai codici per i colori
         const regionNameToCode = {
             'Piemonte': '1',
@@ -1318,7 +1673,301 @@
                     updateChart();
                 }, 250);
             });
+
+            // Gestione chiusura modal con ESC
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeDataModal();
+                }
+            });
         });
+
+        // ========== FUNZIONI PER LA TABELLA DATI ==========
+
+        function openDataModal() {
+            updateTableData();
+            document.getElementById('dataModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDataModal() {
+            document.getElementById('dataModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function updateTableData() {
+            // Ottieni i dati filtrati
+            currentTableData = getFilteredData();
+            
+            // Reset ordinamento e paginazione
+            currentPage = 1;
+            
+            // Aggiorna conteggio record
+            document.getElementById('tableRecordCount').textContent = 
+                `${currentTableData.length} record trovati`;
+            
+            renderTable();
+            renderPagination();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            // Calcola record per la pagina corrente
+            const startIndex = (currentPage - 1) * recordsPerPage;
+            const endIndex = startIndex + recordsPerPage;
+            const pageData = currentTableData.slice(startIndex, endIndex);
+            
+            pageData.forEach(record => {
+                const row = document.createElement('tr');
+                
+                // Formatta le date
+                const dataInvio = formatDate(record.data_invio_candidatura);
+                const dataFinanziamento = formatDate(record.data_finanziamento);
+                
+                // Formatta l'importo
+                const importo = formatCurrency(parseFloat(record.importo_finanziamento) || 0);
+                
+                // Tronca l'avviso se troppo lungo
+                const avviso = record.avviso.length > 50 ? 
+                    record.avviso.substring(0, 50) + '...' : record.avviso;
+                
+                row.innerHTML = `
+                    <td title="${record.regione}">${record.regione}</td>
+                    <td title="${record.provincia}">${record.provincia}</td>
+                    <td title="${record.comune}">${record.comune}</td>
+                    <td title="${record.codice_cup}">${record.codice_cup}</td>
+                    <td title="${record.avviso}">${avviso}</td>
+                    <td title="${dataInvio}">${dataInvio}</td>
+                    <td title="${dataFinanziamento}">${dataFinanziamento}</td>
+                    <td title="${importo}">${importo}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(currentTableData.length / recordsPerPage);
+            const pagination = document.getElementById('tablePagination');
+            pagination.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // Bottone Precedente
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'pagination-btn';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => changePage(currentPage - 1);
+            pagination.appendChild(prevBtn);
+            
+            // Calcola range di pagine da mostrare
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            // Prima pagina se necessario
+            if (startPage > 1) {
+                const firstBtn = document.createElement('button');
+                firstBtn.className = 'pagination-btn';
+                firstBtn.textContent = '1';
+                firstBtn.onclick = () => changePage(1);
+                pagination.appendChild(firstBtn);
+                
+                if (startPage > 2) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.textContent = '...';
+                    ellipsis.className = 'pagination-info';
+                    pagination.appendChild(ellipsis);
+                }
+            }
+            
+            // Pagine visibili
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = 'pagination-btn';
+                if (i === currentPage) pageBtn.classList.add('active');
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => changePage(i);
+                pagination.appendChild(pageBtn);
+            }
+            
+            // Ultima pagina se necessario
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.textContent = '...';
+                    ellipsis.className = 'pagination-info';
+                    pagination.appendChild(ellipsis);
+                }
+                
+                const lastBtn = document.createElement('button');
+                lastBtn.className = 'pagination-btn';
+                lastBtn.textContent = totalPages;
+                lastBtn.onclick = () => changePage(totalPages);
+                pagination.appendChild(lastBtn);
+            }
+            
+            // Info pagina
+            const info = document.createElement('span');
+            info.className = 'pagination-info';
+            info.textContent = `Pagina ${currentPage} di ${totalPages}`;
+            pagination.appendChild(info);
+            
+            // Bottone Successivo
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'pagination-btn';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => changePage(currentPage + 1);
+            pagination.appendChild(nextBtn);
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(currentTableData.length / recordsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTable();
+                renderPagination();
+                
+                // Scroll to top della tabella
+                document.querySelector('.table-container').scrollTop = 0;
+            }
+        }
+
+        function sortTable(column) {
+            // Rimuovi classi di ordinamento precedenti
+            document.querySelectorAll('.data-table th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            // Determina direzione dell'ordinamento
+            if (tableSortColumn === column) {
+                tableSortDirection = tableSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                tableSortDirection = 'asc';
+                tableSortColumn = column;
+            }
+            
+            // Applica classe di ordinamento
+            const header = document.querySelector(`th[onclick="sortTable('${column}')"]`);
+            if (header) {
+                header.classList.add(tableSortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+            
+            // Ordina i dati
+            currentTableData.sort((a, b) => {
+                let valueA = a[column] || '';
+                let valueB = b[column] || '';
+                
+                // Gestione speciale per importi e date
+                if (column === 'importo_finanziamento') {
+                    valueA = parseFloat(valueA) || 0;
+                    valueB = parseFloat(valueB) || 0;
+                } else if (column.includes('data_')) {
+                    valueA = new Date(valueA);
+                    valueB = new Date(valueB);
+                } else {
+                    valueA = valueA.toString().toLowerCase();
+                    valueB = valueB.toString().toLowerCase();
+                }
+                
+                if (tableSortDirection === 'asc') {
+                    return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+                } else {
+                    return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+                }
+            });
+            
+            // Reset alla prima pagina e re-render
+            currentPage = 1;
+            renderTable();
+            renderPagination();
+        }
+
+        function downloadFilteredCSV() {
+            if (currentTableData.length === 0) {
+                alert('Nessun dato da scaricare');
+                return;
+            }
+
+            // Colonne da includere nel CSV
+            const columns = [
+                'regione',
+                'provincia', 
+                'comune',
+                'codice_cup',
+                'avviso',
+                'data_invio_candidatura',
+                'data_finanziamento',
+                'importo_finanziamento'
+            ];
+
+            const headers = [
+                'Regione',
+                'Provincia',
+                'Comune', 
+                'Codice CUP',
+                'Avviso',
+                'Data Invio Candidatura',
+                'Data Finanziamento',
+                'Importo Finanziamento'
+            ];
+
+            const csvContent = [
+                headers.join(','),
+                ...currentTableData.map(row => 
+                    columns.map(col => {
+                        const value = row[col] || '';
+                        if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+                            return `"${value.replace(/"/g, '""')}"`;
+                        }
+                        return value;
+                    }).join(',')
+                )
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                
+                // Nome file con info sui filtri
+                let fileName = 'pa_digitale_2026_filtrati_';
+                if (currentFilters.regione) fileName += `${currentFilters.regione.replace(/[^a-zA-Z0-9]/g, '_')}_`;
+                if (currentFilters.provincia) fileName += `${currentFilters.provincia.replace(/[^a-zA-Z0-9]/g, '_')}_`;
+                if (currentFilters.comune) fileName += `${currentFilters.comune.replace(/[^a-zA-Z0-9]/g, '_')}_`;
+                fileName += `${new Date().toISOString().split('T')[0]}.csv`;
+                
+                link.setAttribute('download', fileName);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return dateString;
+                return date.toLocaleDateString('it-IT');
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // ========== FUNZIONI ORIGINALI (con alcune modifiche) ==========
 
         // Setup dei filtri con ricerca
         function setupSearchFilters() {
@@ -1508,9 +2157,19 @@
             const initialZoom = isMobile ? 5 : 6;
             const initialCenter = isMobile ? [42.5, 12.5] : [41.9028, 12.4964];
             
-            map = L.map('map', {
-                zoomControl: false // Disabilita controlli di default
-            }).setView(initialCenter, initialZoom);
+// Bounds dell'Italia con margine
+const italyBounds = [
+    [35.0, 5.0],  // Sud-Ovest (con margine)
+    [48.0, 20.0]  // Nord-Est (con margine)
+];
+
+map = L.map('map', {
+    zoomControl: false, // Disabilita controlli di default
+    maxBounds: italyBounds,
+    maxBoundsViscosity: 0.8, // Permette un po' di elasticità
+    minZoom: 5,  // Permette di vedere tutta l'Italia
+    maxZoom: 16
+}).setView(initialCenter, initialZoom); // Mantieni lo zoom originale
             
             // Aggiungi controlli di zoom a destra
             L.control.zoom({
@@ -1521,8 +2180,7 @@
             L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors, © CartoDB - <a href="https://twitter.com/gbvitrano" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>',
                 subdomains: 'abcd',
-                maxZoom: 18
-            }).addTo(map);
+			    }).addTo(map);
         }
 
         function setupTooltip() {
@@ -2167,7 +2825,7 @@
                     }));
                     
                     chartData.sort((a, b) => b.value - a.value);
-                    // Limita ai primi 50 comuni per leggibilità
+                    // Limita ai primi 50 comuni per leggibilità 
                     chartData = chartData.slice(0, 50);
                     break;
                     
