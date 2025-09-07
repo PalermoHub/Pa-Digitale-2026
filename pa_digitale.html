@@ -121,7 +121,7 @@
         h3 {
             color: #E2E8F0;
             margin-bottom: 16px;
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: 600;
         }
 
@@ -1473,7 +1473,7 @@
             <img src="https://raw.githubusercontent.com/SiciliaHub/palermohub/PH-release-v2.0/legend/pa_hub_new_white.png" alt="Logo ODS" class="logo-ods">
             <h2>PA Digitale 2026 PNRR </h2> 
 			<p>Candidature dei Comuni confermate e finanziate nel PNRR con i fondi dedicati alla digitalizzazione della Pubblica Amministrazione -  PA digitale 2026 </p><br>
-            <h3>🎯 Filtri</h3>
+            <h3><i class="fa-solid fa-filter"></i> Filtri</h3>
             
             <div class="filter-group">
                 <label for="regioneFilter">Regione</label>
@@ -1588,7 +1588,7 @@
 
         <!-- Pannello destro - Statistiche e grafico -->
         <div class="panel right-panel">
-            <h2>📊 Statistiche</h2>
+            <h2><i class="fa-solid fa-square-poll-horizontal"></i> Statistiche</h2>
             
             <div class="stats-grid">
                 <div class="stat-card">
@@ -1609,7 +1609,7 @@
                 </div>
             </div>
 
-            <h3 id="chartTitle">💰 Importi finanziati per regione</h3>
+            <h3 id="chartTitle"><i class='fa-solid fa-euro-sign'></i> Importi finanziati per regione</h3>
             
             <!-- Tab per selezione tipo grafico -->
             <div class="chart-tabs">
@@ -2801,7 +2801,7 @@ function showComuneInfo(properties) {
                 case 'dynamic':
                     // Comportamento dinamico basato sui filtri (logica originale)
                     if (currentFilters.comune) {
-                        title = `💰 Importi finanziati per avviso - Comune: ${currentFilters.comune}`;
+                        title = `<i class='fa-solid fa-euro-sign'></i> Importi finanziati per avviso - Comune: ${currentFilters.comune}`;
                         yAxisLabel = "Avviso";
                         
                         const filteredData = candidatureData.filter(c => c.comune === currentFilters.comune);
@@ -2823,7 +2823,7 @@ function showComuneInfo(properties) {
                         
                         chartData.sort((a, b) => b.value - a.value);
                     } else if (currentFilters.provincia) {
-                        title = `💰 Importi finanziati per comune - Provincia: ${currentFilters.provincia}`;
+                        title = `<i class='fa-solid fa-euro-sign'></i> Importi finanziati per comune - Provincia: ${currentFilters.provincia}`;
                         yAxisLabel = "Comune";
                         
                         const filteredData = candidatureData.filter(c => c.provincia === currentFilters.provincia);
@@ -2845,7 +2845,7 @@ function showComuneInfo(properties) {
                         
                         chartData.sort((a, b) => b.value - a.value);
                     } else if (currentFilters.regione) {
-                        title = `💰 Importi finanziati per provincia - Regione: ${currentFilters.regione}`;
+                        title = `<i class='fa-solid fa-euro-sign'></i>  Importi finanziati per provincia - Regione: ${currentFilters.regione}`;
                         yAxisLabel = "Provincia";
                         
                         const filteredData = candidatureData.filter(c => c.regione === currentFilters.regione);
@@ -2867,7 +2867,7 @@ function showComuneInfo(properties) {
                         
                         chartData.sort((a, b) => b.value - a.value);
                     } else {
-                        title = "💰 Importi finanziati per regione";
+                        title = "<i class='fa-solid fa-euro-sign'></i>  Importi finanziati per regione";
                         yAxisLabel = "Regione";
                         
                         const regioniData = {};
@@ -2890,7 +2890,7 @@ function showComuneInfo(properties) {
                     break;
                     
                 case 'comuni':
-                    title = "💰 Importi finanziati per comune (Top 50)";
+                    title = "<i class='fa-solid fa-euro-sign'></i>  Importi finanziati per comune (Top 50)";
                     yAxisLabel = "Comune";
                     
                     // Applica filtri se presenti (escluso comune)
@@ -2926,7 +2926,7 @@ function showComuneInfo(properties) {
                     break;
                     
                 case 'avvisi':
-                    title = "💰 Importi finanziati per avviso";
+                    title = "<i class='fa-solid fa-euro-sign'></i> Importi finanziati per avviso";
                     yAxisLabel = "Avviso";
                     
                     // Applica filtri se presenti (escluso avviso)
@@ -2960,7 +2960,7 @@ function showComuneInfo(properties) {
                     break;
             }
             
-            document.getElementById("chartTitle").textContent = title;
+            document.getElementById("chartTitle").innerHTML = title;
             drawBarChart(chartData, yAxisLabel);
         }
 
