@@ -1430,5 +1430,50 @@
     transform: scale(1.1);
 }
 
-.leaflet-container a.leaflet-popup-close-button {color: #ffffff; }
+.leaflet-container a.leaflet-popup-close-button {color: #ffffff!important;     background: #ef4444!important;   }
 
+/* Stili per il controllo home personalizzato della mappa */
+.leaflet-control-custom {
+    background: white;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.leaflet-control-custom:hover {
+    background: #f4f4f4;
+    border-color: rgba(0,0,0,0.4);
+    transform: scale(1.05);
+}
+
+.leaflet-control-custom:active {
+    background: #e8e8e8;
+    transform: scale(0.95);
+}
+
+/* Responsive per mobile */
+@media (max-width: 768px) {
+    .leaflet-control-custom {
+        width: 28px !important;
+        height: 28px !important;
+        border-width: 1px;
+    }
+}
+
+/* Miglioramento dell'accessibilità */
+.leaflet-control-custom:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Adattamento al tema scuro della mappa */
+.leaflet-control-custom {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+.leaflet-control-custom:hover {
+    background: rgba(255, 255, 255, 1);
+}

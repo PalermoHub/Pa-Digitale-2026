@@ -12,12 +12,6 @@
         let tooltip;
         let updateInterval;
 
-        // Variabili per la vista iniziale della mappa
-        let initialMapView = {
-            center: null,
-            zoom: null
-        };
-
         // Variabili per la tabella dati
         let currentTableData = [];
         let tableSortColumn = '';
@@ -112,18 +106,6 @@
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(function() {
                     updateChart();
-                }, 250);
-                
-                // Aggiorna la vista iniziale per il pulsante home
-                clearTimeout(window.resizeMapTimeout);
-                window.resizeMapTimeout = setTimeout(function() {
-                    const isMobile = window.innerWidth <= 992;
-                    const newInitialZoom = isMobile ? 5 : 6;
-                    const newInitialCenter = isMobile ? [42.5, 12.5] : [41.9028, 12.4964];
-                    
-                    // Aggiorna la vista iniziale per il pulsante home
-                    initialMapView.center = newInitialCenter;
-                    initialMapView.zoom = newInitialZoom;
                 }, 250);
             });
 
@@ -614,10 +596,6 @@
             const initialZoom = isMobile ? 5 : 6;
             const initialCenter = isMobile ? [42.5, 12.5] : [41.9028, 12.4964];
             
-            // Salva la vista iniziale nelle variabili globali
-            initialMapView.center = initialCenter;
-            initialMapView.zoom = initialZoom;
-            
             // Bounds dell'Italia con margine
             const italyBounds = [
                 [35.0, 5.0],  // Sud-Ovest (con margine)
@@ -627,76 +605,21 @@
             map = L.map('map', {
                 zoomControl: false, // Disabilita controlli di default
                 maxBounds: italyBounds,
-                maxBoundsViscosity: 0.8, // Permette un po' di elasticità   
+                maxBoundsViscosity: 0.8, // Permette un po' di elasticità  
                 minZoom: 5,  // Permette di vedere tutta l'Italia
                 maxZoom: 16
-            }).setView(initialCenter, initialZoom);
+            }).setView(initialCenter, initialZoom); // Mantieni lo zoom originale
             
             // Aggiungi controlli di zoom a destra
             L.control.zoom({
                 position: 'topright'
             }).addTo(map);
             
-            // Aggiungi il controllo home personalizzato
-            const homeControl = L.Control.extend({
-                onAdd: function(map) {
-                    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-                    
-                    container.style.backgroundColor = 'white';
-                    container.style.backgroundImage = "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Im0zIDkgOS03IDkgN3YxMWEyIDIgMCAwIDEtMiAySDVhMiAyIDAgMCAxLTItMnoiLz48cG9seWxpbmUgcG9pbnRzPSI5LDIyIDksMTIgMTUsMTIgMTUsMjIiLz48L3N2Zz4=')";
-                    container.style.backgroundSize = '60%';
-                    container.style.backgroundPosition = 'center';
-                    container.style.backgroundRepeat = 'no-repeat';
-                    container.style.width = '30px';
-                    container.style.height = '30px';
-                    container.style.cursor = 'pointer';
-                    container.style.border = '2px solid rgba(0,0,0,0.2)';
-                    container.style.borderRadius = '4px';
-                    container.title = 'Torna alla vista iniziale';
-                    
-                    container.onclick = function(){
-                        resetMapView();
-                    }
-                    
-                    // Previeni la propagazione degli eventi per evitare conflitti con la mappa
-                    L.DomEvent.disableClickPropagation(container);
-                    
-                    return container;
-                },
-                
-                onRemove: function(map) {
-                    // Cleanup quando il controllo viene rimosso
-                }
-            });
-            
-            // Aggiungi il controllo home in alto a destra, sotto i controlli zoom
-            map.addControl(new homeControl({position: 'topright'}));
-            
             // Mappa CartoDB Dark per meglio integrarsi con il tema scuro
             L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors, © CartoDB - <a href="https://twitter.com/gbvitrano" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>',
                 subdomains: 'abcd',
             }).addTo(map);
-        }
-
-        // Nuova funzione per resettare la vista della mappa
-        function resetMapView() {
-            if (map && initialMapView.center && initialMapView.zoom) {
-                map.setView(initialMapView.center, initialMapView.zoom);
-                
-                // Chiudi eventuali popup aperti
-                map.closePopup();
-                
-                // Aggiorna anche la vista iniziale in caso di resize della finestra
-                const isMobile = window.innerWidth <= 992;
-                const newInitialZoom = isMobile ? 5 : 6;
-                const newInitialCenter = isMobile ? [42.5, 12.5] : [41.9028, 12.4964];
-                
-                initialMapView.center = newInitialCenter;
-                initialMapView.zoom = newInitialZoom;
-                
-                map.setView(newInitialCenter, newInitialZoom);
-            }
         }
 
         function setupTooltip() {
@@ -1396,7 +1319,7 @@
                     }));
                     
                     chartData.sort((a, b) => b.value - a.value);
-                    // Limita ai primi 50 comuni per leggibilità   
+                    // Limita ai primi 50 comuni per leggibilità  
                     chartData = chartData.slice(0, 50);
                     break;
                     
@@ -1598,9 +1521,6 @@
             infoPanels.forEach(panel => {
                 panel.style.display = 'none';
             });
-            
-            // Aggiungi il reset della mappa
-            resetMapView();
             
             updateFilterOptions();
             applyFilters();
