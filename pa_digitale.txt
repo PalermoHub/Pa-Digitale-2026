@@ -85,7 +85,7 @@
         }
 
         .right-panel {
-            overflow-y: hidden;
+            overflow-y: auto;
             background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95));
         }
 
@@ -853,7 +853,6 @@
             .mobile-menu {
                 width: 95vw;
                 padding: 70px 18px 18px;
-				        z-index: 10001;
             }
             
             .logo-beta {
@@ -927,20 +926,6 @@
                 font-size: 24px;
             }
         }
-		
-.chart-tab {
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.chart-tab:hover {
-    transform: scale(1.05);      /* Ingrandisce leggermente */
-    cursor: pointer;
-}
-
-.chart-tab:active {
-    transform: scale(0.95);      /* Effetto "press" */
-}
     </style>
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -1214,20 +1199,6 @@
             </div>
 
             <h3 id="chartTitle">💰 Importi finanziati per regione</h3>
-            
-            <!-- Tab per selezione tipo grafico -->
-            <div class="chart-tabs">
-                <button class="chart-tab active" onclick="switchChartTab('dynamic')" id="tab-dynamic">
-                    Dinamico
-                </button>
-             <button class="chart-tab" onclick="switchChartTab('comuni')" id="tab-comuni">
-                    Per Comune
-                </button>
-                <button class="chart-tab" onclick="switchChartTab('avvisi')" id="tab-avvisi">
-                    Per Avviso
-                </button>
-            </div>
-            
             <div class="chart-container">
                 <svg id="chart" width="100%"></svg>
             </div>
@@ -2039,192 +2010,96 @@
             let title = "";
             let yAxisLabel = "";
             
-            // Usa window.currentChartTab per garantire l'accesso alla variabile
-            const chartTab = window.currentChartTab || 'dynamic';
-            
-            // Gestisce i diversi tab
-            switch(chartTab) {
-                case 'dynamic':
-                    // Comportamento dinamico basato sui filtri (logica originale)
-                    if (currentFilters.comune) {
-                        title = `💰 Importi finanziati per avviso - Comune: ${currentFilters.comune}`;
-                        yAxisLabel = "Avviso";
-                        
-                        const filteredData = candidatureData.filter(c => c.comune === currentFilters.comune);
-                        
-                        const avvisiData = {};
-                        filteredData.forEach(candidatura => {
-                            const avviso = candidatura.avviso;
-                            const importo = parseFloat(candidatura.importo_finanziamento) || 0;
-                            if (!avvisiData[avviso]) {
-                                avvisiData[avviso] = 0;
-                            }
-                            avvisiData[avviso] += importo;
-                        });
-                        
-                        chartData = Object.keys(avvisiData).map(avviso => ({
-                            name: avviso,
-                            value: avvisiData[avviso]
-                        }));
-                        
-                        chartData.sort((a, b) => b.value - a.value);
-                    } else if (currentFilters.provincia) {
-                        title = `💰 Importi finanziati per comune - Provincia: ${currentFilters.provincia}`;
-                        yAxisLabel = "Comune";
-                        
-                        const filteredData = candidatureData.filter(c => c.provincia === currentFilters.provincia);
-                        
-                        const comuniData = {};
-                        filteredData.forEach(candidatura => {
-                            const comune = candidatura.comune;
-                            const importo = parseFloat(candidatura.importo_finanziamento) || 0;
-                            if (!comuniData[comune]) {
-                                comuniData[comune] = 0;
-                            }
-                            comuniData[comune] += importo;
-                        });
-                        
-                        chartData = Object.keys(comuniData).map(comune => ({
-                            name: comune,
-                            value: comuniData[comune]
-                        }));
-                        
-                        chartData.sort((a, b) => b.value - a.value);
-                    } else if (currentFilters.regione) {
-                        title = `💰 Importi finanziati per provincia - Regione: ${currentFilters.regione}`;
-                        yAxisLabel = "Provincia";
-                        
-                        const filteredData = candidatureData.filter(c => c.regione === currentFilters.regione);
-                        
-                        const provinceData = {};
-                        filteredData.forEach(candidatura => {
-                            const provincia = candidatura.provincia;
-                            const importo = parseFloat(candidatura.importo_finanziamento) || 0;
-                            if (!provinceData[provincia]) {
-                                provinceData[provincia] = 0;
-                            }
-                            provinceData[provincia] += importo;
-                        });
-                        
-                        chartData = Object.keys(provinceData).map(provincia => ({
-                            name: provincia,
-                            value: provinceData[provincia]
-                        }));
-                        
-                        chartData.sort((a, b) => b.value - a.value);
-                    } else {
-                        title = "💰 Importi finanziati per regione";
-                        yAxisLabel = "Regione";
-                        
-                        const regioniData = {};
-                        candidatureData.forEach(candidatura => {
-                            const regione = candidatura.regione;
-                            const importo = parseFloat(candidatura.importo_finanziamento) || 0;
-                            if (!regioniData[regione]) {
-                                regioniData[regione] = 0;
-                            }
-                            regioniData[regione] += importo;
-                        });
-                        
-                        chartData = Object.keys(regioniData).map(regione => ({
-                            name: regione,
-                            value: regioniData[regione]
-                        }));
-                        
-                        chartData.sort((a, b) => b.value - a.value);
+            if (currentFilters.comune) {
+                title = `💰 Importi finanziati per avviso - Comune: ${currentFilters.comune}`;
+                yAxisLabel = "Avviso";
+                
+                const filteredData = candidatureData.filter(c => c.comune === currentFilters.comune);
+                
+                const avvisiData = {};
+                filteredData.forEach(candidatura => {
+                    const avviso = candidatura.avviso;
+                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                    if (!avvisiData[avviso]) {
+                        avvisiData[avviso] = 0;
                     }
-                    break;
-                    
-                case 'comuni':
-                    title = "💰 Importi finanziati per comune (Top 50)";
-                    yAxisLabel = "Comune";
-                    
-                    // Applica filtri se presenti (escluso comune)
-                    let filteredForComuni = candidatureData;
-                    if (currentFilters.regione) {
-                        filteredForComuni = filteredForComuni.filter(c => c.regione === currentFilters.regione);
+                    avvisiData[avviso] += importo;
+                });
+                
+                chartData = Object.keys(avvisiData).map(avviso => ({
+                    name: avviso,
+                    value: avvisiData[avviso]
+                }));
+                
+                chartData.sort((a, b) => b.value - a.value);
+            } else if (currentFilters.provincia) {
+                title = `💰 Importi finanziati per comune - Provincia: ${currentFilters.provincia}`;
+                yAxisLabel = "Comune";
+                
+                const filteredData = candidatureData.filter(c => c.provincia === currentFilters.provincia);
+                
+                const comuniData = {};
+                filteredData.forEach(candidatura => {
+                    const comune = candidatura.comune;
+                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                    if (!comuniData[comune]) {
+                        comuniData[comune] = 0;
                     }
-                    if (currentFilters.provincia) {
-                        filteredForComuni = filteredForComuni.filter(c => c.provincia === currentFilters.provincia);
+                    comuniData[comune] += importo;
+                });
+                
+                chartData = Object.keys(comuniData).map(comune => ({
+                    name: comune,
+                    value: comuniData[comune]
+                }));
+                
+                chartData.sort((a, b) => b.value - a.value);
+            } else if (currentFilters.regione) {
+                title = `💰 Importi finanziati per provincia - Regione: ${currentFilters.regione}`;
+                yAxisLabel = "Provincia";
+                
+                const filteredData = candidatureData.filter(c => c.regione === currentFilters.regione);
+                
+                const provinceData = {};
+                filteredData.forEach(candidatura => {
+                    const provincia = candidatura.provincia;
+                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                    if (!provinceData[provincia]) {
+                        provinceData[provincia] = 0;
                     }
-                    if (currentFilters.avviso) {
-                        filteredForComuni = filteredForComuni.filter(c => c.avviso === currentFilters.avviso);
+                    provinceData[provincia] += importo;
+                });
+                
+                chartData = Object.keys(provinceData).map(provincia => ({
+                    name: provincia,
+                    value: provinceData[provincia]
+                }));
+                
+                chartData.sort((a, b) => b.value - a.value);
+            } else {
+                title = "💰 Importi finanziati per regione";
+                yAxisLabel = "Regione";
+                
+                const regioniData = {};
+                candidatureData.forEach(candidatura => {
+                    const regione = candidatura.regione;
+                    const importo = parseFloat(candidatura.importo_finanziamento) || 0;
+                    if (!regioniData[regione]) {
+                        regioniData[regione] = 0;
                     }
-                    
-                    const comuniDataAll = {};
-                    filteredForComuni.forEach(candidatura => {
-                        const comune = candidatura.comune;
-                        const importo = parseFloat(candidatura.importo_finanziamento) || 0;
-                        if (!comuniDataAll[comune]) {
-                            comuniDataAll[comune] = 0;
-                        }
-                        comuniDataAll[comune] += importo;
-                    });
-                    
-                    chartData = Object.keys(comuniDataAll).map(comune => ({
-                        name: comune,
-                        value: comuniDataAll[comune]
-                    }));
-                    
-                    chartData.sort((a, b) => b.value - a.value);
-                    // Limita ai primi 50 comuni per leggibilità
-                    chartData = chartData.slice(0, 50);
-                    break;
-                    
-                case 'avvisi':
-                    title = "💰 Importi finanziati per avviso";
-                    yAxisLabel = "Avviso";
-                    
-                    // Applica filtri se presenti (escluso avviso)
-                    let filteredForAvvisi = candidatureData;
-                    if (currentFilters.regione) {
-                        filteredForAvvisi = filteredForAvvisi.filter(c => c.regione === currentFilters.regione);
-                    }
-                    if (currentFilters.provincia) {
-                        filteredForAvvisi = filteredForAvvisi.filter(c => c.provincia === currentFilters.provincia);
-                    }
-                    if (currentFilters.comune) {
-                        filteredForAvvisi = filteredForAvvisi.filter(c => c.comune === currentFilters.comune);
-                    }
-                    
-                    const avvisiDataAll = {};
-                    filteredForAvvisi.forEach(candidatura => {
-                        const avviso = candidatura.avviso;
-                        const importo = parseFloat(candidatura.importo_finanziamento) || 0;
-                        if (!avvisiDataAll[avviso]) {
-                            avvisiDataAll[avviso] = 0;
-                        }
-                        avvisiDataAll[avviso] += importo;
-                    });
-                    
-                    chartData = Object.keys(avvisiDataAll).map(avviso => ({
-                        name: avviso,
-                        value: avvisiDataAll[avviso]
-                    }));
-                    
-                    chartData.sort((a, b) => b.value - a.value);
-                    break;
+                    regioniData[regione] += importo;
+                });
+                
+                chartData = Object.keys(regioniData).map(regione => ({
+                    name: regione,
+                    value: regioniData[regione]
+                }));
+                
+                chartData.sort((a, b) => b.value - a.value);
             }
             
             document.getElementById("chartTitle").textContent = title;
             drawBarChart(chartData, yAxisLabel);
-        }
-
-        // Funzione per cambiare tab del grafico (resa globale)
-        window.switchChartTab = function(tabName) {
-            // Rimuovi classe active da tutti i tab
-            document.querySelectorAll('.chart-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Aggiungi classe active al tab selezionato
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-            
-            // Aggiorna il tab corrente
-            window.currentChartTab = tabName;
-            
-            // Aggiorna il grafico
-            updateChart();
         }
 
         function drawBarChart(data, yAxisLabel) {
