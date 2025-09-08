@@ -178,9 +178,14 @@
         
         <div class="filter-group">
             <label for="regioneFilterMobile">Regione</label>
-            <select id="regioneFilterMobile">
-                <option value="">Tutte le regioni</option>
-            </select>
+            <div class="search-filter">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="regioneFilterMobile" placeholder="Cerca regione...">
+                <button class="clear-btn" id="regioneClearMobile">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="filter-dropdown" id="regioneDropdownMobile"></div>
+            </div>
         </div>
 
         <div class="filter-group">
@@ -209,9 +214,14 @@
 
         <div class="filter-group">
             <label for="avvisoFilterMobile">Avviso</label>
-            <select id="avvisoFilterMobile">
-                <option value="">Tutti gli avvisi</option>
-            </select>
+            <div class="search-filter">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="avvisoFilterMobile" placeholder="Cerca avviso...">
+                <button class="clear-btn" id="avvisoClearMobile">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="filter-dropdown" id="avvisoDropdownMobile"></div>
+            </div>
         </div>
 
         <div class="action-buttons">
@@ -286,7 +296,7 @@
         <div class="panel left-panel" id="desktopLeftPanel">
             <!-- Logo ODS prima del titolo filtri -->
            <a href="https://palermohub.opendatasicilia.it/" Title="PalermoHub è come una grande biblioteca digitale piena di mappe interattive di Palermo e della Sicilia. Invece di libri sugli scaffali, qui trovi centinaia di mappe che mostrano tutto quello che può interessarti della città: dal traffico ai monumenti, dalla geologia alle piste ciclabili.
-Rende visibili e accessibili dati che spesso sono sepolti in documenti tecnici o siti istituzionali difficili da navigare, é un po’ come tradurre il “burocratese” in linguaggio normale e presentarlo in modo visivamente comprensibile." target="_blank">
+Rende visibili e accessibili dati che spesso sono sepolti in documenti tecnici o siti istituzionali difficili da navigare, é un po' come tradurre il "burocratese" in linguaggio normale e presentarlo in modo visivamente comprensibile." target="_blank">
    <img src="https://raw.githubusercontent.com/SiciliaHub/palermohub/PH-release-v2.0/legend/pa_hub_new_white.png" alt="Logo ODS" class="logo-ods">
 </a>
             <h2>PA Digitale 2026 PNRR </h2> 
@@ -295,9 +305,14 @@ Rende visibili e accessibili dati che spesso sono sepolti in documenti tecnici o
             
             <div class="filter-group">
                 <label for="regioneFilter">Regione</label>
-                <select id="regioneFilter">
-                    <option value="">Tutte le regioni</option>
-                </select>
+                <div class="search-filter">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="regioneFilter" placeholder="Cerca regione...">
+                    <button class="clear-btn" id="regioneClear">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="filter-dropdown" id="regioneDropdown"></div>
+                </div>
             </div>
 
             <div class="filter-group">
@@ -326,9 +341,14 @@ Rende visibili e accessibili dati che spesso sono sepolti in documenti tecnici o
 
             <div class="filter-group">
                 <label for="avvisoFilter">Avviso</label>
-                <select id="avvisoFilter">
-                    <option value="">Tutti gli avvisi</option>
-                </select>
+                <div class="search-filter">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="avvisoFilter" placeholder="Cerca avviso...">
+                    <button class="clear-btn" id="avvisoClear">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="filter-dropdown" id="avvisoDropdown"></div>
+                </div>
             </div>
 
             <div class="action-buttons">
