@@ -738,7 +738,7 @@
             
             // Mappa CartoDB Dark per meglio integrarsi con il tema scuro
             L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors, Â© CartoDB - <a href="https://twitter.com/gbvitrano" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>',
+                attribution: 'Â© OpenStreetMap contributors, Â© CartoDB - <a href="https://twitter.com/gbvitrano" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>',
                 subdomains: 'abcd',
             }).addTo(map);
         }
@@ -1271,6 +1271,13 @@
                 currentFilters.comune || currentFilters.avviso) {
                 zoomToFiltered();
             }
+        }
+
+        // Versione senza zoom per evitare doppi zoom quando si seleziona manualmente
+        function applyFiltersWithoutZoom() {
+            updateStats();
+            updateChart();
+            updateMapLayer();
         }
 
         function getFilteredData() {
