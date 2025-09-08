@@ -51,9 +51,9 @@
         // Mappatura nomi regioni ai codici per i colori
         const regionNameToCode = {
             'Piemonte': '1',
-            'Valle d\'Aosta/VallÃ©e d\'Aoste': '2',
+            'Valle d\'Aosta/Vallée d\'Aoste': '2',
             'Lombardia': '3',
-            'Trentino-Alto Adige/SÃ¼dtirol': '4',
+            'Trentino-Alto Adige/Südtirol': '4',
             'Veneto': '5',
             'Friuli-Venezia Giulia': '6',
             'Liguria': '7',
@@ -691,7 +691,7 @@
             map = L.map('map', {
                 zoomControl: false, // Disabilita controlli di default
                 maxBounds: italyBounds,
-                maxBoundsViscosity: 0.8, // Permette un po' di elasticità    
+                maxBoundsViscosity: 0.8, // Permette un po' di elasticità     
                 minZoom: 5,  // Permette di vedere tutta l'Italia
                 maxZoom: 16
             }).setView(initialCenter, initialZoom);
@@ -738,7 +738,7 @@
             
             // Mappa CartoDB Dark per meglio integrarsi con il tema scuro
             L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
-                attribution: 'Â© OpenStreetMap contributors, Â© CartoDB - <a href="https://twitter.com/gbvitrano" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>',
+                attribution: '© OpenStreetMap contributors, © CartoDB - <a href="https://twitter.com/gbvitrano" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>',
                 subdomains: 'abcd',
             }).addTo(map);
         }
@@ -1061,7 +1061,7 @@
             
             if (candidature) {
                 content += `<br/>Progetti: ${candidature.numeroProgetti}`;
-                content += `<br/>Importo: â‚¬${candidature.totaleImporto.toLocaleString('it-IT')}`;
+                content += `<br/>Importo: €${candidature.totaleImporto.toLocaleString('it-IT')}`;
             } else {
                 content += '<br/>Nessun progetto finanziato';
             }
@@ -1084,7 +1084,7 @@
             let popupContent = `
                 <div style="color: #2c3e50; font-family: 'Inter', sans-serif; min-width: 400px;">
                     <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 12px; margin: -16px -16px 16px -16px; border-radius: 12px 12px 0 0;">
-                        <h4 style="margin: 0; font-size: 16px; font-weight: 600;">ðŸ›ï¸ ${properties.comune}</h4>
+                        <h4 style="margin: 0; font-size: 16px; font-weight: 600;">🏛️ ${properties.comune}</h4>
                         <div style="font-size: 13px; opacity: 0.9; margin-top: 4px;">${properties.den_uts} (${properties.sigla})</div>
                     </div>
             `;
@@ -1097,7 +1097,7 @@
                             <div style="font-size: 11px; color: #64748b;">Progetti</div>
                         </div>
                         <div style="background: #f8fafc; padding: 8px; border-radius: 8px; text-align: center; border-left: 3px solid #3b82f6;">
-                            <div style="font-size: 14px; font-weight: 700; color: #3b82f6;">â‚¬${properties.candidature.totaleImporto.toLocaleString('it-IT')}</div>
+                            <div style="font-size: 14px; font-weight: 700; color: #3b82f6;">€${properties.candidature.totaleImporto.toLocaleString('it-IT')}</div>
                             <div style="font-size: 11px; color: #64748b;">Importo totale</div>
                         </div>
                     </div>
@@ -1143,7 +1143,7 @@
                         <tr style="background: ${rowBg}; transition: background 0.2s;">
                             <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; font-family: monospace; font-size: 10px; color: #6366f1;" title="${cupCode}">${cupDisplay}</td>
                             <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; line-height: 1.3;" title="${candidatura.avviso}">${avvisoShort}</td>
-                            <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 600; color: #059669;">â‚¬${importo.toLocaleString('it-IT')}</td>
+                            <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 600; color: #059669;">€${importo.toLocaleString('it-IT')}</td>
                             <td style="padding: 8px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 10px; color: #64748b;">${dataFinanziamento}</td>
                         </tr>
                     `;
@@ -1445,7 +1445,7 @@
                     }));
                     
                     chartData.sort((a, b) => b.value - a.value);
-                    // Limita ai primi 50 comuni per leggibilità    
+                    // Limita ai primi 50 comuni per leggibilità     
                     chartData = chartData.slice(0, 50);
                     break;
                     
@@ -1623,11 +1623,11 @@
 
         function formatCurrency(value) {
             if (value >= 1000000) {
-                return (value / 1000000).toFixed(1) + 'Mâ‚¬';
+                return (value / 1000000).toFixed(1) + 'M€';
             } else if (value >= 1000) {
-                return (value / 1000).toFixed(1) + 'kâ‚¬';
+                return (value / 1000).toFixed(1) + 'k€';
             } else {
-                return 'â‚¬' + value.toFixed(0);
+                return '€' + value.toFixed(0);
             }
         }
 
